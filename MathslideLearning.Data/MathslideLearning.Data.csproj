@@ -9,7 +9,8 @@
   <ItemGroup>
     <Folder Include="Entities\" />
     <Folder Include="DbContext\" />
-    <Folder Include="Repositories\Interfaces\" />
+    <Folder Include="Interfaces\" />
+    <Folder Include="Repositories\" />
   </ItemGroup>
 
   <ItemGroup>
