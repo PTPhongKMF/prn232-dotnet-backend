@@ -1,8 +1,7 @@
 ﻿using MathslideLearning.Business.Interfaces;
-using MathslideLearning.Common.Models;
 using MathslideLearning.Data.Entities;
 using MathslideLearning.Data.Interfaces;
-using MathslideLearning.Models;
+using MathslideLearning.Models.SlideDtos;
 using System;
 using System.Linq;
 using System.Threading.Tasks;

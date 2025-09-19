@@ -1,4 +1,4 @@
-﻿namespace MathslideLearning.Common.Models
+﻿namespace MathslideLearning.Models.AccountsDtos
 {
     public class UserResponseDto
     {

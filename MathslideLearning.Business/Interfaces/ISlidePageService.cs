@@ -1,5 +1,5 @@
-﻿using MathslideLearning.Common.Models;
-using MathslideLearning.Data.Entities;
+﻿using MathslideLearning.Data.Entities;
+using MathslideLearning.Models.SlideDtos;
 using System.Threading.Tasks;
 
 namespace MathslideLearning.Business.Interfaces

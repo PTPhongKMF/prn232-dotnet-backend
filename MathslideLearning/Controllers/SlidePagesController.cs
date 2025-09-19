@@ -1,5 +1,5 @@
 ﻿using MathslideLearning.Business.Interfaces;
-using MathslideLearning.Common.Models;
+using MathslideLearning.Models.SlideDtos;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System;

@@ -1,5 +1,5 @@
-﻿using MathslideLearning.Common.Models;
-using MathslideLearning.Data.Entities;
+﻿using MathslideLearning.Data.Entities;
+using MathslideLearning.Models.AccountsDtos;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 

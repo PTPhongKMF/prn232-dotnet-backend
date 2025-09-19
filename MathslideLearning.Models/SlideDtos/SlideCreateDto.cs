@@ -1,14 +1,9 @@
-﻿using MathslideLearning.Common.Models;
-using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace MathslideLearning.Models
+namespace MathslideLearning.Models.SlideDtos
 {
-    public class SlideUpdateDto
+    public class SlideCreateDto
     {
         [Required]
         [MinLength(3, ErrorMessage = "Title must be at least 3 characters long.")]
@@ -25,7 +20,7 @@ namespace MathslideLearning.Models
         [Range(1, 12, ErrorMessage = "Grade must be between 1 and 12.")]
         public int? Grade { get; set; }
 
-        public bool IsPublished { get; set; }
+        public bool IsPublished { get; set; } = false; 
 
         [Required]
         public List<SlidePageCreateDto> SlidePages { get; set; }

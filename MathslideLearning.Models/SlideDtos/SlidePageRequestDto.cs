@@ -1,14 +1,14 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace MathslideLearning.Common.Models
+namespace MathslideLearning.Models.SlideDtos
 {
-    public class SlidePageCreateDto
+    public class SlidePageRequestDto
     {
         [Required]
         public int OrderNumber { get; set; }
 
+        [MaxLength(255)]
         public string? Title { get; set; }
-
         public string? Content { get; set; }
     }
 }

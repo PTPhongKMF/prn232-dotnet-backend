@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace MathslideLearning.Common.Models
+namespace MathslideLearning.Models.AccountsDtos
 {
     public class LoginRequestDto
     {
