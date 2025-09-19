@@ -1,7 +1,6 @@
 using MathslideLearning.Business.Interfaces;
 using MathslideLearning.Business.Services;
 using MathslideLearning.Data.DbContext;
-using MathslideLearning.Data.Entities;
 using MathslideLearning.Data.Interfaces;
 using MathslideLearning.Data.Repositories;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -13,20 +12,24 @@ using System.Text;
 var builder = WebApplication.CreateBuilder(args);
 var configuration = builder.Configuration;
 
-// --- Service Configuration ---
+var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 builder.Services.AddDbContext<MathslideLearningDbContext>(options =>
-    options.UseSqlServer(configuration.GetConnectionString("DefaultConnection")));
+    options.UseSqlServer(connectionString));
 
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IUserService, UserService>();
-
 builder.Services.AddScoped<ISlideRepository, SlideRepository>();
 builder.Services.AddScoped<ISlideService, SlideService>();
 
+builder.Services.AddScoped<ISlidePageRepository, SlidePageRepository>();
+builder.Services.AddScoped<ISlidePageService, SlidePageService>();
+
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
+
 builder.Services.AddSwaggerGen(options =>
 {
+    options.SwaggerDoc("v1", new OpenApiInfo { Title = "Mathslide Learning API", Version = "v1" });
     options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
     {
         In = ParameterLocation.Header,
@@ -67,30 +70,30 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
         };
     });
 
-
 var app = builder.Build();
 
 using (var scope = app.Services.CreateScope())
 {
     var services = scope.ServiceProvider;
     var context = services.GetRequiredService<MathslideLearningDbContext>();
-    context.Database.EnsureCreated();
-
+    if (context.Database.GetPendingMigrations().Any())
+    {
+        context.Database.Migrate();
+    }
     if (!context.Users.Any())
     {
-        var adminUser = new User
+        context.Users.Add(new MathslideLearning.Data.Entities.User
         {
-            Name = "Default Admin",
+            Name = "Admin User",
             Email = "admin@gmail.com",
-            Password = "123", 
+            Password = "123",
             Role = "Admin",
             Grade = null
-        };
-        context.Users.Add(adminUser);
+        });
         context.SaveChanges();
     }
 }
-// Configure the HTTP request pipeline.
+
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
@@ -99,7 +102,6 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
-// This must come BEFORE app.UseAuthorization()
 app.UseAuthentication();
 app.UseAuthorization();
 
