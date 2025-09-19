@@ -15,9 +15,10 @@ namespace MathslideLearning.Data.Entities
         public int? Grade { get; set; }
         public bool IsPublished { get; set; }
         public DateTime CreatedAt { get; set; }
+
         public virtual User Teacher { get; set; }
         public virtual ICollection<SlidePage> SlidePages { get; set; } = new List<SlidePage>();
-        public virtual ICollection<PurchasedSlide> PurchasedByUsers { get; set; } = new List<PurchasedSlide>();
         public virtual ICollection<SlideTag> SlideTags { get; set; } = new List<SlideTag>();
+        public virtual ICollection<ReceiptDetail> ReceiptDetails { get; set; } = new List<ReceiptDetail>();
     }
 }

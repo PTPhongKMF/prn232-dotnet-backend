@@ -20,6 +20,9 @@ builder.Services.AddDbContext<MathslideLearningDbContext>(options =>
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IUserService, UserService>();
 
+builder.Services.AddScoped<ISlideRepository, SlideRepository>();
+builder.Services.AddScoped<ISlideService, SlideService>();
+
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(options =>

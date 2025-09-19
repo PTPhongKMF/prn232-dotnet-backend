@@ -7,11 +7,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Folder Include="Interfaces\" />
-    <Folder Include="Services\" />
-  </ItemGroup>
-
-  <ItemGroup>
     <ProjectReference Include="..\MathslideLearning.Data\MathslideLearning.Data.csproj" />
     <ProjectReference Include="..\MathslideLearning.Models\MathslideLearning.Models.csproj" />
   </ItemGroup>
