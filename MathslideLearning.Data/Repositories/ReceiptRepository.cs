@@ -16,7 +16,16 @@ namespace MathslideLearning.Data.Repositories
         {
             _context = context;
         }
-
+        public async Task<IEnumerable<ReceiptDetail>> GetSalesByTeacherIdAsync(int teacherId)
+        {
+            return await _context.ReceiptDetails
+                .Include(rd => rd.Receipt)
+                    .ThenInclude(r => r.User)
+                .Include(rd => rd.Slide)
+                .Where(rd => rd.Slide.TeacherId == teacherId && rd.Receipt.Status == "Completed")
+                .OrderByDescending(rd => rd.Receipt.CreatedAt)
+                .ToListAsync();
+        }
         public async Task<Receipt> CreateReceiptAsync(Receipt receipt)
         {
             await _context.Receipts.AddAsync(receipt);
@@ -52,4 +61,3 @@ namespace MathslideLearning.Data.Repositories
         }
     }
 }
-

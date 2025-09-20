@@ -1,0 +1,15 @@
+﻿using MathslideLearning.Data.Entities;
+using System.Collections.Generic;
+using System.Threading.Tasks;
+
+namespace MathslideLearning.Data.Interfaces
+{
+    public interface IQuestionRepository
+    {
+        Task<Question> GetByIdAsync(int id);
+        Task<IEnumerable<Question>> GetAllAsync();
+        Task<Question> CreateAsync(Question question);
+        Task<Question> UpdateAsync(Question question);
+        Task<bool> DeleteAsync(int id);
+    }
+}

@@ -2,6 +2,8 @@
 using MathslideLearning.Common.Models;
 using MathslideLearning.Data.Entities;
 using MathslideLearning.Data.Interfaces;
+using MathslideLearning.Models;
+using MathslideLearning.Models.AccountsDtos;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -95,4 +97,3 @@ namespace MathslideLearning.Business.Services
         }
     }
 }
-

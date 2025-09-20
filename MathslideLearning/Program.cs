@@ -16,17 +16,22 @@ var connectionString = builder.Configuration.GetConnectionString("DefaultConnect
 builder.Services.AddDbContext<MathslideLearningDbContext>(options =>
     options.UseSqlServer(connectionString));
 
-builder.Services.AddScoped<IUserRepository, UserRepository>();
-builder.Services.AddScoped<IUserService, UserService>();
-builder.Services.AddScoped<ISlideRepository, SlideRepository>();
-builder.Services.AddScoped<ISlideService, SlideService>();
-builder.Services.AddScoped<IPaymentMethodRepository, PaymentMethodRepository>();
-builder.Services.AddScoped<IReceiptRepository, ReceiptRepository>();
-
-builder.Services.AddScoped<ISlidePageRepository, SlidePageRepository>();
-builder.Services.AddScoped<ISlidePageService, SlidePageService>();
+// ===== Services =====
 builder.Services.AddScoped<IPaymentMethodService, PaymentMethodService>();
 builder.Services.AddScoped<IPurchaseService, PurchaseService>();
+builder.Services.AddScoped<ISlidePageService, SlidePageService>();
+builder.Services.AddScoped<ISlideService, SlideService>();
+builder.Services.AddScoped<ITagService, TagService>();
+builder.Services.AddScoped<IUserService, UserService>();
+
+// ===== Repositories =====
+builder.Services.AddScoped<IPaymentMethodRepository, PaymentMethodRepository>();
+builder.Services.AddScoped<IReceiptRepository, ReceiptRepository>();
+builder.Services.AddScoped<ISlidePageRepository, SlidePageRepository>();
+builder.Services.AddScoped<ISlideRepository, SlideRepository>();
+builder.Services.AddScoped<ITagRepository, TagRepository>();
+builder.Services.AddScoped<IUserRepository, UserRepository>();
+
 
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
