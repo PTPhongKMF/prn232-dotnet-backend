@@ -1,6 +1,6 @@
 ﻿using MathslideLearning.Business.Interfaces;
 using MathslideLearning.Data.Interfaces;
-using MathslideLearning.Models.DashboardDtos;
+using MathslideLearning.Models.PaymentDtos;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;

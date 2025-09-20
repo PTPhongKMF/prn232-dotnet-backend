@@ -1,4 +1,4 @@
-﻿namespace MathslideLearning.Common.Models
+﻿namespace MathslideLearning.Models.PaymentDtos
 {
     public class PaymentMethodDto
     {

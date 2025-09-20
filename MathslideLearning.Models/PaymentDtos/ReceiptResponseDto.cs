@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace MathslideLearning.Common.Models
+namespace MathslideLearning.Models.PaymentDtos
 {
     public class ReceiptResponseDto
     {

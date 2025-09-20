@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace MathslideLearning.Common.Models
+namespace MathslideLearning.Models.PaymentDtos
 {
     public class PaymentMethodRequestDto
     {

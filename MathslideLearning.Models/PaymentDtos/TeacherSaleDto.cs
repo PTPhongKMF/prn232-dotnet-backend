@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace MathslideLearning.Models.DashboardDtos
+namespace MathslideLearning.Models.PaymentDtos
 {
     public class TeacherSaleDto
     {

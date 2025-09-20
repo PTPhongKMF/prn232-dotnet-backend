@@ -1,4 +1,4 @@
-﻿using MathslideLearning.Common.Models;
+﻿using MathslideLearning.Models.PaymentDtos;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
