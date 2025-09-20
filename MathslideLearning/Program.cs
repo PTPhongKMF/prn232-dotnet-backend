@@ -40,6 +40,8 @@ builder.Services.AddScoped<ISlidePageService, SlidePageService>();
 builder.Services.AddScoped<ISlideService, SlideService>();
 builder.Services.AddScoped<ITagService, TagService>();
 builder.Services.AddScoped<IUserService, UserService>();
+builder.Services.AddScoped<IExamService, ExamService>();
+builder.Services.AddScoped<IQuestionService, QuestionService>();
 
 // ===== Repositories =====
 builder.Services.AddScoped<IPaymentMethodRepository, PaymentMethodRepository>();
@@ -48,7 +50,8 @@ builder.Services.AddScoped<ISlidePageRepository, SlidePageRepository>();
 builder.Services.AddScoped<ISlideRepository, SlideRepository>();
 builder.Services.AddScoped<ITagRepository, TagRepository>();
 builder.Services.AddScoped<IUserRepository, UserRepository>();
-
+builder.Services.AddScoped<IExamRepository, ExamRepository>();
+builder.Services.AddScoped<IQuestionRepository, QuestionRepository>();
 
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
