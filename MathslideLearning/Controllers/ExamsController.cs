@@ -1,5 +1,6 @@
 ﻿using MathslideLearning.Business.Interfaces;
 using MathslideLearning.Models.ExamDtos;
+using MathslideLearning.Models.QuestionDtos;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System;

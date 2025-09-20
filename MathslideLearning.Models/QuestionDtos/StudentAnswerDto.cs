@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
-namespace MathslideLearning.Models.ExamDtos
+namespace MathslideLearning.Models.QuestionDtos
 {
 
     public class StudentAnswerDto
