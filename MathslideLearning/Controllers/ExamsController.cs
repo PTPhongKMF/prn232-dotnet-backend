@@ -10,7 +10,7 @@ namespace MathslideLearning.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    [Authorize(Roles = "Admin,Teacher")]
+    [Authorize]
     public class ExamsController : ControllerBase
     {
         private readonly IExamService _examService;
@@ -21,6 +21,7 @@ namespace MathslideLearning.Controllers
         }
 
         [HttpPost]
+        [Authorize(Roles = "Admin,Teacher")]
         public async Task<IActionResult> CreateExam([FromBody] ExamRequestDto request)
         {
             if (!ModelState.IsValid) return BadRequest(ModelState);
@@ -38,12 +39,20 @@ namespace MathslideLearning.Controllers
         }
 
         [HttpGet("{id}")]
+        [Authorize(Roles = "Admin,Teacher")]
         public async Task<IActionResult> GetExamById(int id)
         {
             try
             {
-                var exam = await _examService.GetExamByIdAsync(id);
-                return Ok(exam);
+                var examDto = await _examService.GetExamByIdAsync(id);
+                var currentUserId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
+
+                if (!User.IsInRole("Admin") && examDto.TeacherId != currentUserId)
+                {
+                    return Forbid();
+                }
+
+                return Ok(examDto);
             }
             catch (Exception ex)
             {
@@ -52,6 +61,7 @@ namespace MathslideLearning.Controllers
         }
 
         [HttpGet("my-exams")]
+        [Authorize(Roles = "Admin,Teacher")]
         public async Task<IActionResult> GetMyExams()
         {
             var teacherId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
@@ -60,6 +70,7 @@ namespace MathslideLearning.Controllers
         }
 
         [HttpPut("{id}")]
+        [Authorize(Roles = "Admin,Teacher")]
         public async Task<IActionResult> UpdateExam(int id, [FromBody] ExamRequestDto request)
         {
             if (!ModelState.IsValid) return BadRequest(ModelState);
@@ -77,6 +88,7 @@ namespace MathslideLearning.Controllers
         }
 
         [HttpDelete("{id}")]
+        [Authorize(Roles = "Admin,Teacher")]
         public async Task<IActionResult> DeleteExam(int id)
         {
             try
@@ -91,5 +103,33 @@ namespace MathslideLearning.Controllers
                 return BadRequest(new { message = ex.Message });
             }
         }
+
+        [HttpPost("{examId}/submit")]
+        [Authorize(Roles = "Student")]
+        public async Task<IActionResult> SubmitExam(int examId, [FromBody] ExamSubmissionDto submission)
+        {
+            if (!ModelState.IsValid) return BadRequest(ModelState);
+
+            try
+            {
+                var studentId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
+                var result = await _examService.SubmitExamAsync(studentId, examId, submission);
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
+        }
+
+        [HttpGet("history")]
+        [Authorize(Roles = "Student")]
+        public async Task<IActionResult> GetMyExamHistory()
+        {
+            var studentId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
+            var history = await _examService.GetExamHistoryForStudentAsync(studentId);
+            return Ok(history);
+        }
     }
 }
+

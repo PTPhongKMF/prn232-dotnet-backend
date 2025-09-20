@@ -7,6 +7,7 @@ using MathslideLearning.Models.TagDtos;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.Json;
 using System.Threading.Tasks;
 
 namespace MathslideLearning.Business.Services
@@ -15,11 +16,13 @@ namespace MathslideLearning.Business.Services
     {
         private readonly IExamRepository _examRepository;
         private readonly IQuestionRepository _questionRepository;
+        private readonly IUserExamHistoryRepository _historyRepository;
 
-        public ExamService(IExamRepository examRepository, IQuestionRepository questionRepository)
+        public ExamService(IExamRepository examRepository, IQuestionRepository questionRepository, IUserExamHistoryRepository historyRepository)
         {
             _examRepository = examRepository;
             _questionRepository = questionRepository;
+            _historyRepository = historyRepository;
         }
 
         public async Task<ExamResponseDto> CreateExamAsync(int teacherId, ExamRequestDto request)
@@ -46,13 +49,20 @@ namespace MathslideLearning.Business.Services
         {
             var exam = await _examRepository.GetByIdAsync(examId);
             if (exam == null) throw new Exception("Exam not found.");
-            return MapToResponseDto(exam);
+            return MapToExamDetailDto(exam); 
         }
 
         public async Task<IEnumerable<ExamResponseDto>> GetExamsByTeacherAsync(int teacherId)
         {
             var exams = await _examRepository.GetByTeacherIdAsync(teacherId);
-            return exams.Select(e => new ExamResponseDto { Id = e.Id, Name = e.Name, Content = e.Content });
+
+            return exams.Select(e => new ExamResponseDto
+            {
+                Id = e.Id,
+                Name = e.Name,
+                Content = e.Content,
+                TeacherName = e.Teacher?.Name
+            });
         }
 
         public async Task<ExamResponseDto> UpdateExamAsync(int examId, int teacherId, ExamRequestDto request)
@@ -89,7 +99,61 @@ namespace MathslideLearning.Business.Services
             return await _examRepository.DeleteAsync(examId);
         }
 
-        private ExamResponseDto MapToResponseDto(Exam exam)
+        // --- Student Methods ---
+        public async Task<ExamResultDto> SubmitExamAsync(int studentId, int examId, ExamSubmissionDto submission)
+        {
+            var exam = await _examRepository.GetByIdAsync(examId);
+            if (exam == null) throw new Exception("Exam not found.");
+
+            int score = 0;
+            var correctAnswers = exam.ExamQuestions
+                .SelectMany(eq => eq.Question.Answers.Where(a => a.IsCorrect))
+                .ToDictionary(a => a.QuestionId, a => a.Id);
+
+            foreach (var submittedAnswer in submission.Answers)
+            {
+                if (correctAnswers.TryGetValue(submittedAnswer.QuestionId, out int correctAnswerId) && submittedAnswer.AnswerId == correctAnswerId)
+                {
+                    score++;
+                }
+            }
+
+            var history = new UserExamHistory
+            {
+                UserId = studentId,
+                ExamId = examId,
+                Score = score,
+                SubmittedAt = DateTime.UtcNow,
+                Content = JsonSerializer.Serialize(submission.Answers)
+            };
+
+            await _historyRepository.CreateAsync(history);
+
+            return new ExamResultDto
+            {
+                ExamId = examId,
+                ExamName = exam.Name,
+                Score = score,
+                TotalQuestions = exam.ExamQuestions.Count,
+                SubmittedAt = history.SubmittedAt
+            };
+        }
+
+        public async Task<IEnumerable<UserExamHistoryDto>> GetExamHistoryForStudentAsync(int studentId)
+        {
+            var history = await _historyRepository.GetByUserIdAsync(studentId);
+            return history.Select(h => new UserExamHistoryDto
+            {
+                Id = h.Id,
+                ExamId = h.ExamId,
+                ExamName = h.Exam.Name,
+                Score = h.Score,
+                SubmittedAt = h.SubmittedAt,
+                Content = h.Content
+            });
+        }
+
+        private ExamResponseDto MapToExamDetailDto(Exam exam)
         {
             return new ExamResponseDto
             {
@@ -109,3 +173,4 @@ namespace MathslideLearning.Business.Services
         }
     }
 }
+
