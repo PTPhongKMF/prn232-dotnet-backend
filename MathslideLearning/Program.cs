@@ -1,3 +1,5 @@
+using System.Text;
+using DotNetEnv;
 using MathslideLearning.Business.Interfaces;
 using MathslideLearning.Business.Services;
 using MathslideLearning.Data.DbContext;
@@ -7,14 +9,29 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
-using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
+
+Env.Load();
+
 var configuration = builder.Configuration;
 
-var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+//var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+//builder.Services.AddDbContext<MathslideLearningDbContext>(options =>
+//    options.UseSqlServer(connectionString));
+
+var connectionString =
+    $"server={Environment.GetEnvironmentVariable("MYSQL_HOST")};" +
+    $"port={Environment.GetEnvironmentVariable("MYSQL_PORT")};" +
+    $"database={Environment.GetEnvironmentVariable("MYSQL_DATABASE")};" +
+    $"user={Environment.GetEnvironmentVariable("MYSQL_USER")};" +
+    $"password={Environment.GetEnvironmentVariable("MYSQL_PASSWORD")};" +
+    $"SslMode={Environment.GetEnvironmentVariable("MYSQL_SSLMODE")};";
+
+Console.WriteLine("Connection string (debug): " + connectionString);
+
 builder.Services.AddDbContext<MathslideLearningDbContext>(options =>
-    options.UseSqlServer(connectionString));
+    options.UseMySql(connectionString, new MySqlServerVersion(new Version(8, 0, 36))));
 
 // ===== Services =====
 builder.Services.AddScoped<IPaymentMethodService, PaymentMethodService>();
@@ -117,4 +134,5 @@ app.UseAuthorization();
 app.MapControllers();
 
 app.Run();
+
 
