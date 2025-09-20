@@ -54,6 +54,15 @@ builder.Services.AddScoped<IExamRepository, ExamRepository>();
 builder.Services.AddScoped<IQuestionRepository, QuestionRepository>();
 builder.Services.AddScoped<IUserExamHistoryRepository, UserExamHistoryRepository>();
 
+builder.Services.AddCors(options => {
+    options.AddPolicy("AllowedOrigins",
+        policy => {
+            policy.WithOrigins("http://localhost:5173", "https://mathslidelearning.pages.dev")
+                  .AllowAnyHeader()
+                  .AllowAnyMethod();
+        });
+});
+
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 
@@ -131,6 +140,7 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+app.UseCors("AllowedOrigins");
 
 app.UseAuthentication();
 app.UseAuthorization();
