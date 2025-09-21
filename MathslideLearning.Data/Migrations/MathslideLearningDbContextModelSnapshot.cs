@@ -18,26 +18,171 @@ namespace MathslideLearning.Data.Migrations
 #pragma warning disable 612, 618
             modelBuilder
                 .HasAnnotation("ProductVersion", "9.0.9")
-                .HasAnnotation("Relational:MaxIdentifierLength", 128);
+                .HasAnnotation("Relational:MaxIdentifierLength", 64);
 
-            SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
+            MySqlModelBuilderExtensions.AutoIncrementColumns(modelBuilder);
 
-            modelBuilder.Entity("MathslideLearning.Data.Entities.PurchasedSlide", b =>
+            modelBuilder.Entity("MathslideLearning.Data.Entities.Answer", b =>
                 {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Content")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<bool>("IsCorrect")
+                        .HasColumnType("tinyint(1)");
+
+                    b.Property<int>("QuestionId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("QuestionId");
+
+                    b.ToTable("Answers");
+                });
+
+            modelBuilder.Entity("MathslideLearning.Data.Entities.Exam", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Content")
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<int>("TeacherId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("TeacherId");
+
+                    b.ToTable("Exams");
+                });
+
+            modelBuilder.Entity("MathslideLearning.Data.Entities.ExamQuestion", b =>
+                {
+                    b.Property<int>("ExamId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("QuestionId")
+                        .HasColumnType("int");
+
+                    b.HasKey("ExamId", "QuestionId");
+
+                    b.HasIndex("QuestionId");
+
+                    b.ToTable("ExamQuestions");
+                });
+
+            modelBuilder.Entity("MathslideLearning.Data.Entities.PaymentMethod", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("PaymentMethods");
+                });
+
+            modelBuilder.Entity("MathslideLearning.Data.Entities.Question", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Content")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("Type")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Questions");
+                });
+
+            modelBuilder.Entity("MathslideLearning.Data.Entities.QuestionTag", b =>
+                {
+                    b.Property<int>("QuestionId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("TagId")
+                        .HasColumnType("int");
+
+                    b.HasKey("QuestionId", "TagId");
+
+                    b.HasIndex("TagId");
+
+                    b.ToTable("QuestionTags");
+                });
+
+            modelBuilder.Entity("MathslideLearning.Data.Entities.Receipt", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<int>("PaymentMethodId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
                     b.Property<int>("UserId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("PaymentMethodId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("Receipts");
+                });
+
+            modelBuilder.Entity("MathslideLearning.Data.Entities.ReceiptDetail", b =>
+                {
+                    b.Property<int>("ReceiptId")
                         .HasColumnType("int");
 
                     b.Property<int>("SlideId")
                         .HasColumnType("int");
 
-                    b.Property<DateTime>("PurchasedAt")
-                        .HasColumnType("datetime2");
-
-                    b.HasKey("UserId", "SlideId");
+                    b.HasKey("ReceiptId", "SlideId");
 
                     b.HasIndex("SlideId");
 
-                    b.ToTable("PurchasedSlides");
+                    b.ToTable("ReceiptDetails");
                 });
 
             modelBuilder.Entity("MathslideLearning.Data.Entities.Slide", b =>
@@ -46,35 +191,35 @@ namespace MathslideLearning.Data.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<string>("ContentType")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("longtext");
 
                     b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime2");
+                        .HasColumnType("datetime(6)");
 
                     b.Property<string>("FileUrl")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("longtext");
 
                     b.Property<int?>("Grade")
                         .HasColumnType("int");
 
                     b.Property<bool>("IsPublished")
-                        .HasColumnType("bit");
+                        .HasColumnType("tinyint(1)");
 
                     b.Property<decimal>("Price")
-                        .HasColumnType("decimal(18,2)");
+                        .HasColumnType("decimal(65,30)");
 
                     b.Property<int>("TeacherId")
                         .HasColumnType("int");
 
                     b.Property<string>("Title")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("longtext");
 
                     b.Property<string>("Topic")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("longtext");
 
                     b.HasKey("Id");
 
@@ -89,10 +234,10 @@ namespace MathslideLearning.Data.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<string>("Content")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("longtext");
 
                     b.Property<int>("OrderNumber")
                         .HasColumnType("int");
@@ -101,7 +246,7 @@ namespace MathslideLearning.Data.Migrations
                         .HasColumnType("int");
 
                     b.Property<string>("Title")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("longtext");
 
                     b.HasKey("Id");
 
@@ -131,11 +276,11 @@ namespace MathslideLearning.Data.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("longtext");
 
                     b.HasKey("Id");
 
@@ -148,49 +293,160 @@ namespace MathslideLearning.Data.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<string>("Email")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("longtext");
 
                     b.Property<int?>("Grade")
                         .HasColumnType("int");
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("longtext");
 
                     b.Property<string>("Password")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("longtext");
 
                     b.Property<string>("Role")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("longtext");
 
                     b.HasKey("Id");
 
                     b.ToTable("Users");
                 });
 
-            modelBuilder.Entity("MathslideLearning.Data.Entities.PurchasedSlide", b =>
+            modelBuilder.Entity("MathslideLearning.Data.Entities.UserExamHistory", b =>
                 {
-                    b.HasOne("MathslideLearning.Data.Entities.Slide", "Slide")
-                        .WithMany("PurchasedByUsers")
-                        .HasForeignKey("SlideId")
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Content")
+                        .HasColumnType("longtext");
+
+                    b.Property<int>("ExamId")
+                        .HasColumnType("int");
+
+                    b.Property<decimal>("Score")
+                        .HasColumnType("decimal(65,30)");
+
+                    b.Property<DateTime>("SubmittedAt")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ExamId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("UserExamHistories");
+                });
+
+            modelBuilder.Entity("MathslideLearning.Data.Entities.Answer", b =>
+                {
+                    b.HasOne("MathslideLearning.Data.Entities.Question", "Question")
+                        .WithMany("Answers")
+                        .HasForeignKey("QuestionId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Question");
+                });
+
+            modelBuilder.Entity("MathslideLearning.Data.Entities.Exam", b =>
+                {
+                    b.HasOne("MathslideLearning.Data.Entities.User", "Teacher")
+                        .WithMany("CreatedExams")
+                        .HasForeignKey("TeacherId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Teacher");
+                });
+
+            modelBuilder.Entity("MathslideLearning.Data.Entities.ExamQuestion", b =>
+                {
+                    b.HasOne("MathslideLearning.Data.Entities.Exam", "Exam")
+                        .WithMany("ExamQuestions")
+                        .HasForeignKey("ExamId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("MathslideLearning.Data.Entities.Question", "Question")
+                        .WithMany("ExamQuestions")
+                        .HasForeignKey("QuestionId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Exam");
+
+                    b.Navigation("Question");
+                });
+
+            modelBuilder.Entity("MathslideLearning.Data.Entities.QuestionTag", b =>
+                {
+                    b.HasOne("MathslideLearning.Data.Entities.Question", "Question")
+                        .WithMany("QuestionTags")
+                        .HasForeignKey("QuestionId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("MathslideLearning.Data.Entities.Tag", "Tag")
+                        .WithMany("QuestionTags")
+                        .HasForeignKey("TagId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Question");
+
+                    b.Navigation("Tag");
+                });
+
+            modelBuilder.Entity("MathslideLearning.Data.Entities.Receipt", b =>
+                {
+                    b.HasOne("MathslideLearning.Data.Entities.PaymentMethod", "PaymentMethod")
+                        .WithMany("Receipts")
+                        .HasForeignKey("PaymentMethodId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("MathslideLearning.Data.Entities.User", "User")
-                        .WithMany("PurchasedSlides")
+                        .WithMany("Receipts")
                         .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("PaymentMethod");
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("MathslideLearning.Data.Entities.ReceiptDetail", b =>
+                {
+                    b.HasOne("MathslideLearning.Data.Entities.Receipt", "Receipt")
+                        .WithMany("ReceiptDetails")
+                        .HasForeignKey("ReceiptId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("Slide");
+                    b.HasOne("MathslideLearning.Data.Entities.Slide", "Slide")
+                        .WithMany("ReceiptDetails")
+                        .HasForeignKey("SlideId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
-                    b.Navigation("User");
+                    b.Navigation("Receipt");
+
+                    b.Navigation("Slide");
                 });
 
             modelBuilder.Entity("MathslideLearning.Data.Entities.Slide", b =>
@@ -234,9 +490,52 @@ namespace MathslideLearning.Data.Migrations
                     b.Navigation("Tag");
                 });
 
+            modelBuilder.Entity("MathslideLearning.Data.Entities.UserExamHistory", b =>
+                {
+                    b.HasOne("MathslideLearning.Data.Entities.Exam", "Exam")
+                        .WithMany()
+                        .HasForeignKey("ExamId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("MathslideLearning.Data.Entities.User", "User")
+                        .WithMany("ExamHistories")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Exam");
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("MathslideLearning.Data.Entities.Exam", b =>
+                {
+                    b.Navigation("ExamQuestions");
+                });
+
+            modelBuilder.Entity("MathslideLearning.Data.Entities.PaymentMethod", b =>
+                {
+                    b.Navigation("Receipts");
+                });
+
+            modelBuilder.Entity("MathslideLearning.Data.Entities.Question", b =>
+                {
+                    b.Navigation("Answers");
+
+                    b.Navigation("ExamQuestions");
+
+                    b.Navigation("QuestionTags");
+                });
+
+            modelBuilder.Entity("MathslideLearning.Data.Entities.Receipt", b =>
+                {
+                    b.Navigation("ReceiptDetails");
+                });
+
             modelBuilder.Entity("MathslideLearning.Data.Entities.Slide", b =>
                 {
-                    b.Navigation("PurchasedByUsers");
+                    b.Navigation("ReceiptDetails");
 
                     b.Navigation("SlidePages");
 
@@ -245,14 +544,20 @@ namespace MathslideLearning.Data.Migrations
 
             modelBuilder.Entity("MathslideLearning.Data.Entities.Tag", b =>
                 {
+                    b.Navigation("QuestionTags");
+
                     b.Navigation("SlideTags");
                 });
 
             modelBuilder.Entity("MathslideLearning.Data.Entities.User", b =>
                 {
+                    b.Navigation("CreatedExams");
+
                     b.Navigation("CreatedSlides");
 
-                    b.Navigation("PurchasedSlides");
+                    b.Navigation("ExamHistories");
+
+                    b.Navigation("Receipts");
                 });
 #pragma warning restore 612, 618
         }

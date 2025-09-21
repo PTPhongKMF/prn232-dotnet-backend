@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using MathslideLearning.Data.Entities;
 
 namespace MathslideLearning.Data.Entities
 {
@@ -10,7 +11,12 @@ namespace MathslideLearning.Data.Entities
         public string Password { get; set; }
         public string Role { get; set; }
         public int? Grade { get; set; }
+
         public virtual ICollection<Slide> CreatedSlides { get; set; } = new List<Slide>();
-        public virtual ICollection<PurchasedSlide> PurchasedSlides { get; set; } = new List<PurchasedSlide>();
+
+        public virtual ICollection<Exam> CreatedExams { get; set; } = new List<Exam>();
+        public virtual ICollection<Receipt> Receipts { get; set; } = new List<Receipt>();
+        public virtual ICollection<UserExamHistory> ExamHistories { get; set; } = new List<UserExamHistory>();
     }
 }
+
