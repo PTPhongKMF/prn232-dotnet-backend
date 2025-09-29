@@ -1,7 +1,9 @@
 ﻿using MathslideLearning.Business.Interfaces;
+using MathslideLearning.Controllers.Base;
 using MathslideLearning.Models.QuestionDtos;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.ModelBinding;
 using System;
 using System.Threading.Tasks;
 
@@ -9,7 +11,7 @@ namespace MathslideLearning.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    public class QuestionsController : ControllerBase
+    public class QuestionsController : ApiControllerBase
     {
         private readonly IQuestionService _questionService;
 
@@ -23,7 +25,7 @@ namespace MathslideLearning.Controllers
         public async Task<IActionResult> GetAll()
         {
             var questions = await _questionService.GetAllQuestionsAsync();
-            return Ok(questions);
+            return ApiOk(questions);
         }
 
         [HttpGet("{id}")]
@@ -33,11 +35,11 @@ namespace MathslideLearning.Controllers
             try
             {
                 var question = await _questionService.GetQuestionByIdAsync(id);
-                return Ok(question);
+                return ApiOk(question);
             }
             catch (Exception ex)
             {
-                return NotFound(new { message = ex.Message });
+                return ApiNotFound<object>(ex.Message);
             }
         }
 
@@ -47,17 +49,17 @@ namespace MathslideLearning.Controllers
         {
             if (!ModelState.IsValid)
             {
-                return BadRequest(ModelState);
+                return ApiBadRequest<ModelStateDictionary>(ModelState, "Validation failed");
             }
 
             try
             {
                 var newQuestion = await _questionService.CreateQuestionAsync(request);
-                return CreatedAtAction(nameof(GetById), new { id = newQuestion.Id }, newQuestion);
+                return ApiCreated(newQuestion);
             }
             catch (Exception ex)
             {
-                return BadRequest(new { message = ex.Message });
+                return ApiBadRequest<object>(new { message = ex.Message });
             }
         }
 
@@ -67,17 +69,17 @@ namespace MathslideLearning.Controllers
         {
             if (!ModelState.IsValid)
             {
-                return BadRequest(ModelState);
+                return ApiBadRequest<ModelStateDictionary>(ModelState, "Validation failed");
             }
 
             try
             {
                 var updatedQuestion = await _questionService.UpdateQuestionAsync(id, request);
-                return Ok(updatedQuestion);
+                return ApiOk(updatedQuestion);
             }
             catch (Exception ex)
             {
-                return BadRequest(new { message = ex.Message });
+                return ApiBadRequest<object>(new { message = ex.Message });
             }
         }
 
@@ -90,13 +92,13 @@ namespace MathslideLearning.Controllers
                 var success = await _questionService.DeleteQuestionAsync(id);
                 if (!success)
                 {
-                    return NotFound();
+                    return ApiNotFound<object>("Question not found");
                 }
-                return NoContent();
+                return ApiOk<object>(null, "Question deleted successfully");
             }
             catch (Exception ex)
             {
-                return BadRequest(new { message = ex.Message });
+                return ApiBadRequest<object>(new { message = ex.Message });
             }
         }
     }

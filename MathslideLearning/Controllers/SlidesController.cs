@@ -1,7 +1,9 @@
 ﻿using MathslideLearning.Business.Interfaces;
+using MathslideLearning.Controllers.Base;
 using MathslideLearning.Models.SlideDtos;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.ModelBinding;
 using System;
 using System.Security.Claims;
 using System.Threading.Tasks;
@@ -11,7 +13,7 @@ namespace MathslideLearning.Controllers
     [ApiController]
     [Route("api/[controller]")]
     [Authorize]
-    public class SlidesController : ControllerBase
+    public class SlidesController : ApiControllerBase
     {
         private readonly ISlideService _slideService;
 
@@ -19,18 +21,31 @@ namespace MathslideLearning.Controllers
         {
             _slideService = slideService;
         }
- 
+
+        private int GetTeacherId()
+        {
+            var userIdString = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (string.IsNullOrEmpty(userIdString))
+            {
+                throw new UnauthorizedAccessException("User ID not found in token");
+            }
+            return int.Parse(userIdString);
+        }
+
         [HttpGet("my-slides")]
         [Authorize(Roles = "Teacher")]
         public async Task<IActionResult> GetMySlides()
         {
-            var userIdString = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            if (string.IsNullOrEmpty(userIdString)) return Unauthorized();
-
-            var teacherId = int.Parse(userIdString);
-
-            var slides = await _slideService.GetSlidesByTeacherIdAsync(teacherId);
-            return Ok(slides);
+            try
+            {
+                var teacherId = GetTeacherId();
+                var slides = await _slideService.GetSlidesByTeacherIdAsync(teacherId);
+                return ApiOk(slides);
+            }
+            catch (UnauthorizedAccessException ex)
+            {
+                return ApiUnauthorized<object>(ex.Message);
+            }
         }
 
         [HttpPut("{id}")]
@@ -39,26 +54,22 @@ namespace MathslideLearning.Controllers
         {
             if (!ModelState.IsValid)
             {
-                return BadRequest(ModelState);
+                return ApiBadRequest<ModelStateDictionary>(ModelState, "Validation failed");
             }
-
-            var userIdString = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            if (string.IsNullOrEmpty(userIdString)) return Unauthorized();
-
-            var teacherId = int.Parse(userIdString);
 
             try
             {
+                var teacherId = GetTeacherId();
                 var updatedSlide = await _slideService.UpdateSlideAsync(id, slideDto, teacherId);
-                return Ok(updatedSlide);
+                return ApiOk(updatedSlide);
             }
             catch (UnauthorizedAccessException ex)
             {
-                return Forbid(ex.Message);
+                return ApiForbidden<object>(ex.Message);
             }
             catch (Exception ex)
             {
-                return NotFound(new { message = ex.Message });
+                return ApiNotFound<object>(ex.Message);
             }
         }
 
@@ -66,54 +77,48 @@ namespace MathslideLearning.Controllers
         [Authorize(Roles = "Teacher")]
         public async Task<IActionResult> DeleteSlide(int id)
         {
-            var userIdString = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            if (string.IsNullOrEmpty(userIdString)) return Unauthorized();
-
-            var teacherId = int.Parse(userIdString);
-
             try
             {
+                var teacherId = GetTeacherId();
                 var success = await _slideService.DeleteSlideAsync(id, teacherId);
                 if (success)
                 {
-                    return NoContent();
+                    return ApiOk<object>(null, "Slide deleted successfully");
                 }
-                return NotFound();
+                return ApiNotFound<object>("Slide not found");
             }
             catch (UnauthorizedAccessException ex)
             {
-                return Forbid(ex.Message);
+                return ApiForbidden<object>(ex.Message);
             }
             catch (Exception ex)
             {
-                return NotFound(new { message = ex.Message });
+                return ApiNotFound<object>(ex.Message);
             }
         }
+
         [HttpPost]
         [Authorize(Roles = "Teacher")]
         public async Task<IActionResult> CreateSlide([FromBody] SlideCreateDto slideDto)
         {
             if (!ModelState.IsValid)
             {
-                return BadRequest(ModelState);
+                return ApiBadRequest<ModelStateDictionary>(ModelState, "Validation failed");
             }
-
-            var userIdString = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            if (string.IsNullOrEmpty(userIdString))
-            {
-                return Unauthorized();
-            }
-
-            var teacherId = int.Parse(userIdString);
 
             try
             {
+                var teacherId = GetTeacherId();
                 var createdSlide = await _slideService.CreateSlideAsync(slideDto, teacherId);
-                return CreatedAtAction(nameof(CreateSlide), new { id = createdSlide.Id }, createdSlide);
+                return ApiCreated(createdSlide);
+            }
+            catch (UnauthorizedAccessException ex)
+            {
+                return ApiUnauthorized<object>(ex.Message);
             }
             catch (Exception ex)
             {
-                return BadRequest(new { message = $"An error occurred while creating the slide: {ex.Message}" });
+                return ApiBadRequest<object>(new { message = $"An error occurred while creating the slide: {ex.Message}" });
             }
         }
     }

@@ -1,7 +1,9 @@
 ﻿using MathslideLearning.Business.Interfaces;
+using MathslideLearning.Controllers.Base;
 using MathslideLearning.Models.SlideDtos;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.ModelBinding;
 using System;
 using System.Security.Claims;
 using System.Threading.Tasks;
@@ -11,7 +13,7 @@ namespace MathslideLearning.Controllers
     [ApiController]
     [Route("api/slides/{slideId}/pages")]
     [Authorize(Roles = "Teacher")]
-    public class SlidePagesController : ControllerBase
+    public class SlidePagesController : ApiControllerBase
     {
         private readonly ISlidePageService _slidePageService;
 
@@ -35,18 +37,18 @@ namespace MathslideLearning.Controllers
         {
             if (!ModelState.IsValid)
             {
-                return BadRequest(ModelState);
+                return ApiBadRequest<ModelStateDictionary>(ModelState, "Validation failed");
             }
 
             try
             {
                 var teacherId = GetCurrentUserId();
                 var newPage = await _slidePageService.AddPageToSlideAsync(slideId, teacherId, pageDto);
-                return CreatedAtAction(nameof(GetPage), new { slideId = slideId, pageId = newPage.Id }, newPage);
+                return ApiCreated(newPage);
             }
             catch (Exception ex)
             {
-                return BadRequest(new { message = ex.Message });
+                return ApiBadRequest<object>(new { message = ex.Message });
             }
         }
 
@@ -55,18 +57,18 @@ namespace MathslideLearning.Controllers
         {
             if (!ModelState.IsValid)
             {
-                return BadRequest(ModelState);
+                return ApiBadRequest<ModelStateDictionary>(ModelState, "Validation failed");
             }
 
             try
             {
                 var teacherId = GetCurrentUserId();
                 var updatedPage = await _slidePageService.UpdateSlidePageAsync(slideId, pageId, teacherId, pageDto);
-                return Ok(updatedPage);
+                return ApiOk(updatedPage);
             }
             catch (Exception ex)
             {
-                return BadRequest(new { message = ex.Message });
+                return ApiBadRequest<object>(new { message = ex.Message });
             }
         }
 
@@ -77,18 +79,18 @@ namespace MathslideLearning.Controllers
             {
                 var teacherId = GetCurrentUserId();
                 await _slidePageService.DeleteSlidePageAsync(slideId, pageId, teacherId);
-                return NoContent();
+                return ApiOk<object>(null, "Page deleted successfully");
             }
             catch (Exception ex)
             {
-                return BadRequest(new { message = ex.Message });
+                return ApiBadRequest<object>(new { message = ex.Message });
             }
         }
 
         [HttpGet("{pageId}")]
         public IActionResult GetPage(int slideId, int pageId)
         {
-            return Ok($"Details for page {pageId} in slide {slideId}");
+            return ApiOk(new { slideId, pageId }, $"Details for page {pageId} in slide {slideId}");
         }
     }
 }

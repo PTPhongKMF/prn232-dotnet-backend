@@ -1,8 +1,10 @@
 ﻿using MathslideLearning.Business.Interfaces;
+using MathslideLearning.Controllers.Base;
 using MathslideLearning.Models.ExamDtos;
 using MathslideLearning.Models.QuestionDtos;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.ModelBinding;
 using System;
 using System.Security.Claims;
 using System.Threading.Tasks;
@@ -12,7 +14,7 @@ namespace MathslideLearning.Controllers
     [ApiController]
     [Route("api/[controller]")]
     [Authorize]
-    public class ExamsController : ControllerBase
+    public class ExamsController : ApiControllerBase
     {
         private readonly IExamService _examService;
 
@@ -25,17 +27,18 @@ namespace MathslideLearning.Controllers
         [Authorize(Roles = "Admin,Teacher")]
         public async Task<IActionResult> CreateExam([FromBody] ExamRequestDto request)
         {
-            if (!ModelState.IsValid) return BadRequest(ModelState);
+            if (!ModelState.IsValid)
+                return ApiBadRequest<ModelStateDictionary>(ModelState, "Validation failed");
 
             try
             {
                 var teacherId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
                 var newExam = await _examService.CreateExamAsync(teacherId, request);
-                return CreatedAtAction(nameof(GetExamById), new { id = newExam.Id }, newExam);
+                return ApiCreated(newExam);
             }
             catch (Exception ex)
             {
-                return BadRequest(new { message = ex.Message });
+                return ApiBadRequest<object>(new { message = ex.Message });
             }
         }
 
@@ -50,14 +53,14 @@ namespace MathslideLearning.Controllers
 
                 if (!User.IsInRole("Admin") && examDto.TeacherId != currentUserId)
                 {
-                    return Forbid();
+                    return ApiForbidden<object>("You don't have permission to access this exam");
                 }
 
-                return Ok(examDto);
+                return ApiOk(examDto);
             }
             catch (Exception ex)
             {
-                return NotFound(new { message = ex.Message });
+                return ApiNotFound<object>(ex.Message);
             }
         }
 
@@ -67,24 +70,25 @@ namespace MathslideLearning.Controllers
         {
             var teacherId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
             var exams = await _examService.GetExamsByTeacherAsync(teacherId);
-            return Ok(exams);
+            return ApiOk(exams);
         }
 
         [HttpPut("{id}")]
         [Authorize(Roles = "Admin,Teacher")]
         public async Task<IActionResult> UpdateExam(int id, [FromBody] ExamRequestDto request)
         {
-            if (!ModelState.IsValid) return BadRequest(ModelState);
+            if (!ModelState.IsValid)
+                return ApiBadRequest<ModelStateDictionary>(ModelState, "Validation failed");
 
             try
             {
                 var teacherId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
                 var updatedExam = await _examService.UpdateExamAsync(id, teacherId, request);
-                return Ok(updatedExam);
+                return ApiOk(updatedExam);
             }
             catch (Exception ex)
             {
-                return BadRequest(new { message = ex.Message });
+                return ApiBadRequest<object>(new { message = ex.Message });
             }
         }
 
@@ -96,12 +100,13 @@ namespace MathslideLearning.Controllers
             {
                 var teacherId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
                 var success = await _examService.DeleteExamAsync(id, teacherId);
-                if (!success) return NotFound();
-                return NoContent();
+                if (!success)
+                    return ApiNotFound<object>("Exam not found");
+                return ApiOk<object>(null, "Exam deleted successfully");
             }
             catch (Exception ex)
             {
-                return BadRequest(new { message = ex.Message });
+                return ApiBadRequest<object>(new { message = ex.Message });
             }
         }
 
@@ -109,17 +114,18 @@ namespace MathslideLearning.Controllers
         [Authorize(Roles = "Student")]
         public async Task<IActionResult> SubmitExam(int examId, [FromBody] ExamSubmissionDto submission)
         {
-            if (!ModelState.IsValid) return BadRequest(ModelState);
+            if (!ModelState.IsValid)
+                return ApiBadRequest<ModelStateDictionary>(ModelState, "Validation failed");
 
             try
             {
                 var studentId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
                 var result = await _examService.SubmitExamAsync(studentId, examId, submission);
-                return Ok(result);
+                return ApiOk(result);
             }
             catch (Exception ex)
             {
-                return BadRequest(new { message = ex.Message });
+                return ApiBadRequest<object>(new { message = ex.Message });
             }
         }
 
@@ -129,8 +135,7 @@ namespace MathslideLearning.Controllers
         {
             var studentId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
             var history = await _examService.GetExamHistoryForStudentAsync(studentId);
-            return Ok(history);
+            return ApiOk(history);
         }
     }
 }
-

@@ -1,7 +1,9 @@
 ﻿using MathslideLearning.Business.Interfaces;
+using MathslideLearning.Controllers.Base;
 using MathslideLearning.Models.PaymentDtos;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.ModelBinding;
 using System;
 using System.Security.Claims;
 using System.Threading.Tasks;
@@ -11,7 +13,7 @@ namespace MathslideLearning.Controllers
     [ApiController]
     [Route("api/[controller]")]
     [Authorize(Roles = "Student")]
-    public class PurchaseController : ControllerBase
+    public class PurchaseController : ApiControllerBase
     {
         private readonly IPurchaseService _purchaseService;
 
@@ -25,18 +27,18 @@ namespace MathslideLearning.Controllers
         {
             if (!ModelState.IsValid)
             {
-                return BadRequest(ModelState);
+                return ApiBadRequest<ModelStateDictionary>(ModelState, "Validation failed");
             }
 
             try
             {
                 var studentId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
                 var receipt = await _purchaseService.PurchaseSlidesAsync(studentId, request);
-                return Ok(receipt);
+                return ApiOk(receipt);
             }
             catch (Exception ex)
             {
-                return BadRequest(new { message = ex.Message });
+                return ApiBadRequest<object>(new { message = ex.Message });
             }
         }
 
@@ -47,13 +49,12 @@ namespace MathslideLearning.Controllers
             {
                 var studentId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
                 var history = await _purchaseService.GetPurchaseHistoryAsync(studentId);
-                return Ok(history);
+                return ApiOk(history);
             }
             catch (Exception ex)
             {
-                return NotFound(new { message = ex.Message });
+                return ApiNotFound<object>(ex.Message);
             }
         }
     }
 }
-
