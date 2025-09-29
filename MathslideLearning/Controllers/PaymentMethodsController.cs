@@ -1,7 +1,9 @@
 ﻿using MathslideLearning.Business.Interfaces;
+using MathslideLearning.Controllers.Base;
 using MathslideLearning.Models.PaymentDtos;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.ModelBinding;
 using System;
 using System.Threading.Tasks;
 
@@ -10,7 +12,7 @@ namespace MathslideLearning.Controllers
     [ApiController]
     [Route("api/[controller]")]
     [Authorize(Roles = "Admin")] // Secure this entire controller for Admins only
-    public class PaymentMethodsController : ControllerBase
+    public class PaymentMethodsController : ApiControllerBase
     {
         private readonly IPaymentMethodService _paymentMethodService;
 
@@ -24,7 +26,7 @@ namespace MathslideLearning.Controllers
         public async Task<IActionResult> GetAll()
         {
             var paymentMethods = await _paymentMethodService.GetAllPaymentMethodsAsync();
-            return Ok(paymentMethods);
+            return ApiOk(paymentMethods);
         }
 
         [HttpGet("{id}")]
@@ -34,11 +36,11 @@ namespace MathslideLearning.Controllers
             try
             {
                 var paymentMethod = await _paymentMethodService.GetPaymentMethodByIdAsync(id);
-                return Ok(paymentMethod);
+                return ApiOk(paymentMethod);
             }
             catch (Exception ex)
             {
-                return NotFound(new { message = ex.Message });
+                return ApiNotFound<object>(ex.Message);
             }
         }
 
@@ -47,17 +49,17 @@ namespace MathslideLearning.Controllers
         {
             if (!ModelState.IsValid)
             {
-                return BadRequest(ModelState);
+                return ApiBadRequest<ModelStateDictionary>(ModelState, "Validation failed");
             }
 
             try
             {
                 var newPaymentMethod = await _paymentMethodService.CreatePaymentMethodAsync(request);
-                return CreatedAtAction(nameof(GetById), new { id = newPaymentMethod.Id }, newPaymentMethod);
+                return ApiCreated(newPaymentMethod);
             }
             catch (Exception ex)
             {
-                return BadRequest(new { message = ex.Message });
+                return ApiBadRequest<object>(new { message = ex.Message });
             }
         }
 
@@ -66,17 +68,17 @@ namespace MathslideLearning.Controllers
         {
             if (!ModelState.IsValid)
             {
-                return BadRequest(ModelState);
+                return ApiBadRequest<ModelStateDictionary>(ModelState, "Validation failed");
             }
 
             try
             {
                 var updatedMethod = await _paymentMethodService.UpdatePaymentMethodAsync(id, request);
-                return Ok(updatedMethod);
+                return ApiOk(updatedMethod);
             }
             catch (Exception ex)
             {
-                return BadRequest(new { message = ex.Message });
+                return ApiBadRequest<object>(new { message = ex.Message });
             }
         }
 
@@ -88,15 +90,14 @@ namespace MathslideLearning.Controllers
                 var success = await _paymentMethodService.DeletePaymentMethodAsync(id);
                 if (!success)
                 {
-                    return NotFound(new { message = "Payment method not found." });
+                    return ApiNotFound<object>("Payment method not found");
                 }
-                return NoContent();
+                return ApiOk<object>(null, "Payment method deleted successfully");
             }
             catch (Exception ex)
             {
-                return BadRequest(new { message = ex.Message });
+                return ApiBadRequest<object>(new { message = ex.Message });
             }
         }
     }
 }
-

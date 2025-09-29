@@ -1,7 +1,9 @@
 ﻿using MathslideLearning.Business.Interfaces;
+using MathslideLearning.Controllers.Base;
 using MathslideLearning.Models.TagDtos;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.ModelBinding;
 using System;
 using System.Threading.Tasks;
 
@@ -9,7 +11,7 @@ namespace MathslideLearning.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    public class TagsController : ControllerBase
+    public class TagsController : ApiControllerBase
     {
         private readonly ITagService _tagService;
 
@@ -23,7 +25,7 @@ namespace MathslideLearning.Controllers
         public async Task<IActionResult> GetAll()
         {
             var tags = await _tagService.GetAllTagsAsync();
-            return Ok(tags);
+            return ApiOk(tags);
         }
 
         [HttpPost]
@@ -32,17 +34,17 @@ namespace MathslideLearning.Controllers
         {
             if (!ModelState.IsValid)
             {
-                return BadRequest(ModelState);
+                return ApiBadRequest<ModelStateDictionary>(ModelState, "Validation failed");
             }
 
             try
             {
                 var newTag = await _tagService.CreateTagAsync(request);
-                return CreatedAtAction(nameof(GetAll), new { id = newTag.Id }, newTag);
+                return ApiCreated(newTag);
             }
             catch (Exception ex)
             {
-                return BadRequest(new { message = ex.Message });
+                return ApiBadRequest<object>(new { message = ex.Message });
             }
         }
 
@@ -52,17 +54,17 @@ namespace MathslideLearning.Controllers
         {
             if (!ModelState.IsValid)
             {
-                return BadRequest(ModelState);
+                return ApiBadRequest<ModelStateDictionary>(ModelState, "Validation failed");
             }
 
             try
             {
                 var updatedTag = await _tagService.UpdateTagAsync(id, request);
-                return Ok(updatedTag);
+                return ApiOk(updatedTag);
             }
             catch (Exception ex)
             {
-                return BadRequest(new { message = ex.Message });
+                return ApiBadRequest<object>(new { message = ex.Message });
             }
         }
 
@@ -75,13 +77,13 @@ namespace MathslideLearning.Controllers
                 var success = await _tagService.DeleteTagAsync(id);
                 if (!success)
                 {
-                    return NotFound();
+                    return ApiNotFound<object>("Tag not found");
                 }
-                return NoContent();
+                return ApiOk<object>(null, "Tag deleted successfully");
             }
             catch (Exception ex)
             {
-                return BadRequest(new { message = ex.Message });
+                return ApiBadRequest<object>(new { message = ex.Message });
             }
         }
     }
