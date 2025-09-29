@@ -1,5 +1,6 @@
 using System.Text;
 using DotNetEnv;
+using MathslideLearning.Business.AutoMapper;
 using MathslideLearning.Business.Interfaces;
 using MathslideLearning.Business.Services;
 using MathslideLearning.Data.DbContext;
@@ -53,6 +54,8 @@ builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IExamRepository, ExamRepository>();
 builder.Services.AddScoped<IQuestionRepository, QuestionRepository>();
 builder.Services.AddScoped<IUserExamHistoryRepository, UserExamHistoryRepository>();
+
+builder.Services.AddAutoMapper(cfg => cfg.AddMaps(typeof(ModelAutoMapper).Assembly));
 
 builder.Services.AddCors(options => {
     options.AddPolicy("AllowedOrigins",

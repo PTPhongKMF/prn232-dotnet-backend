@@ -11,4 +11,12 @@
     <ProjectReference Include="..\MathslideLearning.Models\MathslideLearning.Models.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="AutoMapper\Profiles\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="AutoMapper" Version="15.0.1" />
+  </ItemGroup>
+
 </Project>
