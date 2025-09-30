@@ -50,5 +50,22 @@ namespace MathslideLearning.Controllers
                 return Api400<object>(ex.Message);
             }
         }
+        [HttpDelete("users/{id}")]
+        public async Task<IActionResult> DeleteUser(int id)
+        {
+            try
+            {
+                var success = await _userService.DeleteUserAsync(id);
+                if (!success)
+                {
+                    return Api404<object>("User not found");
+                }
+                return Api200<object>("User deleted successfully", null);
+            }
+            catch (Exception ex)
+            {
+                return Api400<object>(ex.Message, new { message = ex.Message });
+            }
+        }
     }
 }
