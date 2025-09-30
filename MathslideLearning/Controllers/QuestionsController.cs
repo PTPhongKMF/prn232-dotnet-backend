@@ -94,7 +94,7 @@ namespace MathslideLearning.Controllers
                 {
                     return Api404<object>("Question not found");
                 }
-                return Api200<object>("Question deleted successfully", null);
+                return Api200<object?>("Question deleted successfully", null);
             }
             catch (Exception ex)
             {

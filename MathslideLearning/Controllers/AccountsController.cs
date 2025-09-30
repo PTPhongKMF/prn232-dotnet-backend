@@ -64,9 +64,9 @@ namespace MathslideLearning.Controllers
                     return Api404<object>("User not found or already deleted");
                 }
 
-                return Api200<object>("Account deleted successfully", null);
+                return Api200<object?>("Account deleted successfully", null);
             }
-            catch (Exception ex)
+            catch
             {
                 return Api500<object>("An error occurred while deleting the account");
             }
@@ -78,7 +78,7 @@ namespace MathslideLearning.Controllers
         {
             if (!ModelState.IsValid)
             {
-                return Api400<UserResponseDto>("Validation failed", ModelState);
+                return Api400<ModelStateDictionary>("Validation failed", ModelState);
             }
 
             try
@@ -104,7 +104,7 @@ namespace MathslideLearning.Controllers
         {
             if (!ModelState.IsValid)
             {
-                return Api400<UserResponseDto>("Validation failed", ModelState);
+                return Api400<ModelStateDictionary>("Validation failed", ModelState);
             }
 
             try
@@ -129,8 +129,8 @@ namespace MathslideLearning.Controllers
 
             try
             {
-                var token = await _userService.LoginAsync(request);
-                return Api200<object>(new { token });
+                var response = await _userService.LoginAsync(request);
+                return Api200(response);
             }
             catch (Exception ex)
             {

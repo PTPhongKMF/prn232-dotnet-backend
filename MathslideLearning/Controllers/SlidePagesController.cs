@@ -87,10 +87,10 @@ namespace MathslideLearning.Controllers
             }
         }
 
-        [HttpGet("{pageId}")]
-        public IActionResult GetPage(int slideId, int pageId)
-        {
-            return Api200(new { slideId, pageId }, $"Details for page {pageId} in slide {slideId}");
-        }
+        //[HttpGet("{pageId}")]
+        //public IActionResult GetPage(int slideId, int pageId)
+        //{
+        //    return Api200(new { slideId, pageId }, $"Details for page {pageId} in slide {slideId}");
+        //}
     }
 }

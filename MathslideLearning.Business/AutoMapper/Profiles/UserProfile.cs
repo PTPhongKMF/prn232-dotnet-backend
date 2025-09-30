@@ -8,7 +8,7 @@ namespace MathslideLearning.Business.AutoMapper.Profiles
     {
         public UserProfile()
         {
-
+            CreateMap<User, UserResponseDto>();
         }
     }
 }

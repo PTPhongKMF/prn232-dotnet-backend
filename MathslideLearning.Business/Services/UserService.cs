@@ -1,4 +1,5 @@
-﻿using MathslideLearning.Business.Interfaces;
+﻿using AutoMapper;
+using MathslideLearning.Business.Interfaces;
 using MathslideLearning.Data.Entities;
 using MathslideLearning.Data.Interfaces;
 using MathslideLearning.Models.AccountsDtos;
@@ -16,11 +17,13 @@ namespace MathslideLearning.Business.Services
     {
         private readonly IUserRepository _userRepository;
         private readonly IConfiguration _configuration;
+        private readonly IMapper _mapper;
 
-        public UserService(IUserRepository userRepository, IConfiguration configuration)
+        public UserService(IUserRepository userRepository, IConfiguration configuration, IMapper mapper)
         {
             _userRepository = userRepository;
             _configuration = configuration;
+            _mapper = mapper;
         }
 
         public async Task<UserResponseDto> AdminUpdateUserAsync(int userId, AdminUpdateUserRequestDto request)
@@ -66,11 +69,19 @@ namespace MathslideLearning.Business.Services
             return new UserResponseDto { Id = user.Id, Name = user.Name, Email = user.Email, Role = user.Role, Grade = user.Grade };
         }
 
-        public async Task<string> LoginAsync(LoginRequestDto request)
+        public async Task<LoginResponseDto> LoginAsync(LoginRequestDto request)
         {
             var user = await _userRepository.GetUserByEmailAsync(request.Email);
             if (user == null || user.Password != request.Password) throw new Exception("Invalid email or password.");
-            return GenerateJwtToken(user);
+            
+            var token = GenerateJwtToken(user);
+            var userResponse = _mapper.Map<UserResponseDto>(user);
+            
+            return new LoginResponseDto 
+            { 
+                User = userResponse,
+                Token = token 
+            };
         }
 
         public async Task<User> RegisterAsync(RegisterRequestDto request)

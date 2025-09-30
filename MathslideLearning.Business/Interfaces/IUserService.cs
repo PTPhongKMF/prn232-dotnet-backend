@@ -8,7 +8,7 @@ namespace MathslideLearning.Business.Interfaces
     public interface IUserService
     {
         Task<User> RegisterAsync(RegisterRequestDto request);
-        Task<string> LoginAsync(LoginRequestDto request);
+        Task<LoginResponseDto> LoginAsync(LoginRequestDto request);
         Task<UserResponseDto> UpdateUserAsync(int userId, UpdateUserRequestDto request);
         Task<bool> DeleteUserAsync(int userId);
         Task<UserResponseDto> AdminUpdateUserAsync(int userId, AdminUpdateUserRequestDto request);

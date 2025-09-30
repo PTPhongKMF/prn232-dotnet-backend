@@ -35,7 +35,6 @@ builder.Services.AddDbContext<MathslideLearningDbContext>(options =>
     options.UseMySql(connectionString, new MySqlServerVersion(new Version(8, 0, 36))));
 
 // ===== Services =====
-builder.Services.AddScoped(typeof(ApiResponse<>));
 builder.Services.AddScoped<IPaymentMethodService, PaymentMethodService>();
 builder.Services.AddScoped<IPurchaseService, PurchaseService>();
 builder.Services.AddScoped<ISlidePageService, SlidePageService>();
