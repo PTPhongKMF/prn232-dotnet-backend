@@ -5,39 +5,88 @@ namespace MathslideLearning.Controllers.Base
 {
     public class ApiControllerBase : ControllerBase
     {
-        protected IActionResult ApiOk<T>(T data, string message = "Success")
+        protected IActionResult Api200<T>(T data)
         {
-            return StatusCode(200, ApiResponse<T>.Ok(data, message));
+            var response = ApiResponse<T>.Response200(data);
+            return StatusCode(200, response);
         }
 
-        protected IActionResult ApiCreated<T>(T data, string message = "Created successfully")
+        protected IActionResult Api200<T>(string message, T data)
         {
-            return StatusCode(201, ApiResponse<T>.Created(data, message));
+            var response = ApiResponse<T>.Response200(message, data);
+            return StatusCode(200, response);
         }
 
-        protected IActionResult ApiBadRequest<T>(T data, string message = "Bad request")
+        protected IActionResult Api201<T>(T? data = default)
         {
-            return StatusCode(400, ApiResponse<T>.BadRequest(data, message));
+            var response = ApiResponse<T>.Response201(data);
+            return StatusCode(201, response);
         }
 
-        protected IActionResult ApiNotFound<T>(string message = "Not found", T data = default)
+        protected IActionResult Api201<T>(string message, T? data = default)
         {
-            return StatusCode(404, ApiResponse<T>.NotFound(data, message));
+            var response = ApiResponse<T>.Response201(message, data);
+            return StatusCode(201, response);
         }
 
-        protected IActionResult ApiUnauthorized<T>(string message = "Unauthorized", T data = default)
+        protected IActionResult Api400<T>(string message)
         {
-            return StatusCode(401, ApiResponse<T>.Unauthorized(data, message));
+            var response = ApiResponse<T>.Response400(message);
+            return StatusCode(400, response);
         }
 
-        protected IActionResult ApiForbidden<T>(string message = "Forbidden", T data = default)
+        protected IActionResult Api400<T>(string message, T? data)
         {
-            return StatusCode(403, ApiResponse<T>.Forbidden(data, message));
+            var response = ApiResponse<T>.Response400(message, data);
+            return StatusCode(400, response);
         }
 
-        protected IActionResult ApiInternalServerError<T>(string message = "Internal server error", T data = default)
+        protected IActionResult Api404<T>(string message)
         {
-            return StatusCode(500, ApiResponse<T>.InternalServerError(data, message));
+            var response = ApiResponse<T>.Response404(message);
+            return StatusCode(404, response);
+        }
+
+        protected IActionResult Api404<T>(string message, T? data)
+        {
+            var response = ApiResponse<T>.Response404(message, data);
+            return StatusCode(404, response);
+        }
+
+        protected IActionResult Api401<T>(string message)
+        {
+            var response = ApiResponse<T>.Response401(message);
+            return StatusCode(401, response);
+        }
+
+        protected IActionResult Api401<T>(string message, T? data)
+        {
+            var response = ApiResponse<T>.Response401(message, data);
+            return StatusCode(401, response);
+        }
+
+        protected IActionResult Api403<T>(string message)
+        {
+            var response = ApiResponse<T>.Response403(message);
+            return StatusCode(403, response);
+        }
+
+        protected IActionResult Api403<T>(string message, T? data)
+        {
+            var response = ApiResponse<T>.Response403(message, data);
+            return StatusCode(403, response);
+        }
+
+        protected IActionResult Api500<T>(string message)
+        {
+            var response = ApiResponse<T>.Response500(message);
+            return StatusCode(500, response);
+        }
+
+        protected IActionResult Api500<T>(string message, T? data)
+        {
+            var response = ApiResponse<T>.Response500(message, data);
+            return StatusCode(500, response);
         }
     }
 }

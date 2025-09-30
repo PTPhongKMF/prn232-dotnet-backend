@@ -1,4 +1,5 @@
 ﻿using MathslideLearning.Business.Interfaces;
+using MathslideLearning.Controllers.Base;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
@@ -8,7 +9,7 @@ namespace MathslideLearning.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    public class DashboardController : ControllerBase
+    public class DashboardController : ApiControllerBase
     {
         private readonly IDashboardService _dashboardService;
 
@@ -25,7 +26,7 @@ namespace MathslideLearning.Controllers
 
             var salesHistory = await _dashboardService.GetSalesHistoryForTeacherAsync(teacherId);
 
-            return Ok(salesHistory);
+            return Api200(salesHistory);
         }
     }
 }

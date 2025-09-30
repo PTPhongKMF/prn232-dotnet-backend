@@ -40,11 +40,11 @@ namespace MathslideLearning.Controllers
             {
                 var teacherId = GetTeacherId();
                 var slides = await _slideService.GetSlidesByTeacherIdAsync(teacherId);
-                return ApiOk(slides);
+                return Api200(slides);
             }
             catch (UnauthorizedAccessException ex)
             {
-                return ApiUnauthorized<object>(ex.Message);
+                return Api401<object>(ex.Message);
             }
         }
 
@@ -54,22 +54,22 @@ namespace MathslideLearning.Controllers
         {
             if (!ModelState.IsValid)
             {
-                return ApiBadRequest<ModelStateDictionary>(ModelState, "Validation failed");
+                return Api400<ModelStateDictionary>("Validation failed", ModelState);
             }
 
             try
             {
                 var teacherId = GetTeacherId();
                 var updatedSlide = await _slideService.UpdateSlideAsync(id, slideDto, teacherId);
-                return ApiOk(updatedSlide);
+                return Api200(updatedSlide);
             }
             catch (UnauthorizedAccessException ex)
             {
-                return ApiForbidden<object>(ex.Message);
+                return Api403<object>(ex.Message);
             }
             catch (Exception ex)
             {
-                return ApiNotFound<object>(ex.Message);
+                return Api404<object>(ex.Message);
             }
         }
 
@@ -83,17 +83,17 @@ namespace MathslideLearning.Controllers
                 var success = await _slideService.DeleteSlideAsync(id, teacherId);
                 if (success)
                 {
-                    return ApiOk<object>(null, "Slide deleted successfully");
+                    return Api200<object>("Slide deleted successfully", null);
                 }
-                return ApiNotFound<object>("Slide not found");
+                return Api404<object>("Slide not found");
             }
             catch (UnauthorizedAccessException ex)
             {
-                return ApiForbidden<object>(ex.Message);
+                return Api403<object>(ex.Message);
             }
             catch (Exception ex)
             {
-                return ApiNotFound<object>(ex.Message);
+                return Api404<object>(ex.Message);
             }
         }
 
@@ -103,22 +103,22 @@ namespace MathslideLearning.Controllers
         {
             if (!ModelState.IsValid)
             {
-                return ApiBadRequest<ModelStateDictionary>(ModelState, "Validation failed");
+                return Api400<ModelStateDictionary>("Validation failed", ModelState);
             }
 
             try
             {
                 var teacherId = GetTeacherId();
                 var createdSlide = await _slideService.CreateSlideAsync(slideDto, teacherId);
-                return ApiCreated(createdSlide);
+                return Api201(createdSlide);
             }
             catch (UnauthorizedAccessException ex)
             {
-                return ApiUnauthorized<object>(ex.Message);
+                return Api401<object>(ex.Message);
             }
             catch (Exception ex)
             {
-                return ApiBadRequest<object>(new { message = $"An error occurred while creating the slide: {ex.Message}" });
+                return Api400<object>($"An error occurred while creating the slide: {ex.Message}", new { message = $"An error occurred while creating the slide: {ex.Message}" });
             }
         }
     }

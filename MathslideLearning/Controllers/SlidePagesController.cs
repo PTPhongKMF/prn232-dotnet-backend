@@ -37,18 +37,18 @@ namespace MathslideLearning.Controllers
         {
             if (!ModelState.IsValid)
             {
-                return ApiBadRequest<ModelStateDictionary>(ModelState, "Validation failed");
+                return Api400<ModelStateDictionary>("Validation failed", ModelState);
             }
 
             try
             {
                 var teacherId = GetCurrentUserId();
                 var newPage = await _slidePageService.AddPageToSlideAsync(slideId, teacherId, pageDto);
-                return ApiCreated(newPage);
+                return Api201(newPage);
             }
             catch (Exception ex)
             {
-                return ApiBadRequest<object>(new { message = ex.Message });
+                return Api400<object>(ex.Message, new { message = ex.Message });
             }
         }
 
@@ -57,18 +57,18 @@ namespace MathslideLearning.Controllers
         {
             if (!ModelState.IsValid)
             {
-                return ApiBadRequest<ModelStateDictionary>(ModelState, "Validation failed");
+                return Api400<ModelStateDictionary>("Validation failed", ModelState);
             }
 
             try
             {
                 var teacherId = GetCurrentUserId();
                 var updatedPage = await _slidePageService.UpdateSlidePageAsync(slideId, pageId, teacherId, pageDto);
-                return ApiOk(updatedPage);
+                return Api200(updatedPage);
             }
             catch (Exception ex)
             {
-                return ApiBadRequest<object>(new { message = ex.Message });
+                return Api400<object>(ex.Message, new { message = ex.Message });
             }
         }
 
@@ -79,18 +79,18 @@ namespace MathslideLearning.Controllers
             {
                 var teacherId = GetCurrentUserId();
                 await _slidePageService.DeleteSlidePageAsync(slideId, pageId, teacherId);
-                return ApiOk<object>(null, "Page deleted successfully");
+                return Api200<object>("Page deleted successfully", null);
             }
             catch (Exception ex)
             {
-                return ApiBadRequest<object>(new { message = ex.Message });
+                return Api400<object>(ex.Message, new { message = ex.Message });
             }
         }
 
         [HttpGet("{pageId}")]
         public IActionResult GetPage(int slideId, int pageId)
         {
-            return ApiOk(new { slideId, pageId }, $"Details for page {pageId} in slide {slideId}");
+            return Api200(new { slideId, pageId }, $"Details for page {pageId} in slide {slideId}");
         }
     }
 }

@@ -27,18 +27,18 @@ namespace MathslideLearning.Controllers
         {
             if (!ModelState.IsValid)
             {
-                return ApiBadRequest<ModelStateDictionary>(ModelState, "Validation failed");
+                return Api400<ModelStateDictionary>("Validation failed", ModelState);
             }
 
             try
             {
                 var studentId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
                 var receipt = await _purchaseService.PurchaseSlidesAsync(studentId, request);
-                return ApiOk(receipt);
+                return Api200(receipt);
             }
             catch (Exception ex)
             {
-                return ApiBadRequest<object>(new { message = ex.Message });
+                return Api400<object>(ex.Message, new { message = ex.Message });
             }
         }
 
@@ -49,11 +49,11 @@ namespace MathslideLearning.Controllers
             {
                 var studentId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
                 var history = await _purchaseService.GetPurchaseHistoryAsync(studentId);
-                return ApiOk(history);
+                return Api200(history);
             }
             catch (Exception ex)
             {
-                return ApiNotFound<object>(ex.Message);
+                return Api404<object>(ex.Message);
             }
         }
     }
