@@ -4,9 +4,9 @@ public class ApiResponse<T>
 {
     public int StatusCode { get; set; }
     public string Message { get; set; }
-    public T Data { get; set; }
+    public T? Data { get; set; }
 
-    public ApiResponse(int statusCode, string message, T data)
+    private ApiResponse(int statusCode, string message, T? data = default)
     {
         StatusCode = statusCode;
         Message = message;
@@ -14,38 +14,73 @@ public class ApiResponse<T>
     }
 
     // Success responses
-    public static ApiResponse<T> Ok(T data, string message = "Success")
+    public static ApiResponse<T> Response200(T data)
+    {
+        return new ApiResponse<T>(200, "Success", data);
+    }
+
+    public static ApiResponse<T> Response200(string message, T data)
     {
         return new ApiResponse<T>(200, message, data);
     }
 
-    public static ApiResponse<T> Created(T data, string message = "Created successfully")
+    public static ApiResponse<T> Response201(T? data = default)
+    {
+        return new ApiResponse<T>(201, "Created successfully", data);
+    }
+
+    public static ApiResponse<T> Response201(string message, T? data = default)
     {
         return new ApiResponse<T>(201, message, data);
     }
 
     // Error responses
-    public static ApiResponse<T> BadRequest(T data = default, string message = "Bad request")
+    public static ApiResponse<T> Response400(string message)
+    {
+        return new ApiResponse<T>(400, message);
+    }
+
+    public static ApiResponse<T> Response400(string message, T? data)
     {
         return new ApiResponse<T>(400, message, data);
     }
 
-    public static ApiResponse<T> NotFound(T data = default, string message = "Not found")
+    public static ApiResponse<T> Response404(string message)
+    {
+        return new ApiResponse<T>(404, message);
+    }
+
+    public static ApiResponse<T> Response404(string message, T? data)
     {
         return new ApiResponse<T>(404, message, data);
     }
 
-    public static ApiResponse<T> Unauthorized(T data = default, string message = "Unauthorized")
+    public static ApiResponse<T> Response401(string message)
+    {
+        return new ApiResponse<T>(401, message);
+    }
+
+    public static ApiResponse<T> Response401(string message, T? data)
     {
         return new ApiResponse<T>(401, message, data);
     }
 
-    public static ApiResponse<T> Forbidden(T data = default, string message = "Forbidden")
+    public static ApiResponse<T> Response403(string message)
+    {
+        return new ApiResponse<T>(403, message);
+    }
+
+    public static ApiResponse<T> Response403(string message, T? data)
     {
         return new ApiResponse<T>(403, message, data);
     }
 
-    public static ApiResponse<T> InternalServerError(T data = default, string message = "Internal server error")
+    public static ApiResponse<T> Response500(string message)
+    {
+        return new ApiResponse<T>(500, message);
+    }
+
+    public static ApiResponse<T> Response500(string message, T? data)
     {
         return new ApiResponse<T>(500, message, data);
     }

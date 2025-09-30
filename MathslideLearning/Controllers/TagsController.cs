@@ -25,7 +25,7 @@ namespace MathslideLearning.Controllers
         public async Task<IActionResult> GetAll()
         {
             var tags = await _tagService.GetAllTagsAsync();
-            return ApiOk(tags);
+            return Api200(tags);
         }
 
         [HttpPost]
@@ -34,17 +34,17 @@ namespace MathslideLearning.Controllers
         {
             if (!ModelState.IsValid)
             {
-                return ApiBadRequest<ModelStateDictionary>(ModelState, "Validation failed");
+                return Api400<ModelStateDictionary>("Validation failed", ModelState);
             }
 
             try
             {
                 var newTag = await _tagService.CreateTagAsync(request);
-                return ApiCreated(newTag);
+                return Api201(newTag);
             }
             catch (Exception ex)
             {
-                return ApiBadRequest<object>(new { message = ex.Message });
+                return Api400<object>(ex.Message, new { message = ex.Message });
             }
         }
 
@@ -54,17 +54,17 @@ namespace MathslideLearning.Controllers
         {
             if (!ModelState.IsValid)
             {
-                return ApiBadRequest<ModelStateDictionary>(ModelState, "Validation failed");
+                return Api400<ModelStateDictionary>("Validation failed", ModelState);
             }
 
             try
             {
                 var updatedTag = await _tagService.UpdateTagAsync(id, request);
-                return ApiOk(updatedTag);
+                return Api200(updatedTag);
             }
             catch (Exception ex)
             {
-                return ApiBadRequest<object>(new { message = ex.Message });
+                return Api400<object>(ex.Message, new { message = ex.Message });
             }
         }
 
@@ -77,13 +77,13 @@ namespace MathslideLearning.Controllers
                 var success = await _tagService.DeleteTagAsync(id);
                 if (!success)
                 {
-                    return ApiNotFound<object>("Tag not found");
+                    return Api404<object>("Tag not found");
                 }
-                return ApiOk<object>(null, "Tag deleted successfully");
+                return Api200<object>("Tag deleted successfully", null);
             }
             catch (Exception ex)
             {
-                return ApiBadRequest<object>(new { message = ex.Message });
+                return Api400<object>(ex.Message, new { message = ex.Message });
             }
         }
     }

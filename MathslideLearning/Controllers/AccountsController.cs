@@ -1,10 +1,12 @@
 ﻿using MathslideLearning.Business.Interfaces;
 using MathslideLearning.Controllers.Base;
+using MathslideLearning.Models;
 using MathslideLearning.Models.AccountsDtos;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using System;
+using System.Runtime.InteropServices;
 using System.Security.Claims;
 using System.Threading.Tasks;
 
@@ -30,16 +32,16 @@ namespace MathslideLearning.Controllers
                 var userIdString = User.FindFirstValue(ClaimTypes.NameIdentifier);
                 if (string.IsNullOrEmpty(userIdString))
                 {
-                    return ApiUnauthorized<object>("Invalid token");
+                    return Api401<UserResponseDto>("Invalid token");
                 }
 
                 var userId = int.Parse(userIdString);
                 var userProfile = await _userService.GetUserProfileAsync(userId);
-                return ApiOk(userProfile);
+                return Api200(userProfile);
             }
             catch (Exception ex)
             {
-                return ApiNotFound<object>(ex.Message);
+                return Api404<UserResponseDto>(ex.Message);
             }
         }
 
@@ -52,21 +54,21 @@ namespace MathslideLearning.Controllers
                 var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
                 if (userIdClaim == null || !int.TryParse(userIdClaim.Value, out var userId))
                 {
-                    return ApiUnauthorized<object>("Invalid token");
+                    return Api401<object>("Invalid token");
                 }
 
                 var result = await _userService.DeleteUserAsync(userId);
 
                 if (!result)
                 {
-                    return ApiNotFound<object>("User not found or already deleted");
+                    return Api404<object>("User not found or already deleted");
                 }
 
-                return ApiOk<object>(null, "Account deleted successfully");
+                return Api200<object>("Account deleted successfully", null);
             }
             catch (Exception ex)
             {
-                return ApiInternalServerError<object>("An error occurred while deleting the account", new { error = ex.Message });
+                return Api500<object>("An error occurred while deleting the account");
             }
         }
 
@@ -76,7 +78,7 @@ namespace MathslideLearning.Controllers
         {
             if (!ModelState.IsValid)
             {
-                return ApiBadRequest<ModelStateDictionary>(ModelState, "Validation failed");
+                return Api400<UserResponseDto>("Validation failed", ModelState);
             }
 
             try
@@ -84,15 +86,15 @@ namespace MathslideLearning.Controllers
                 var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
                 if (userIdClaim == null || !int.TryParse(userIdClaim.Value, out var userId))
                 {
-                    return ApiUnauthorized<object>("Invalid token");
+                    return Api401<UserResponseDto>("Invalid token");
                 }
 
                 var updatedUser = await _userService.UpdateUserAsync(userId, request);
-                return ApiOk(updatedUser);
+                return Api200(updatedUser);
             }
             catch (Exception ex)
             {
-                return ApiBadRequest<object>(ex.Message);
+                return Api400<UserResponseDto>(ex.Message);
             }
         }
 
@@ -102,17 +104,17 @@ namespace MathslideLearning.Controllers
         {
             if (!ModelState.IsValid)
             {
-                return ApiBadRequest<ModelStateDictionary>(ModelState, "Validation failed");
+                return Api400<UserResponseDto>("Validation failed", ModelState);
             }
 
             try
             {
                 var newUser = await _userService.RegisterAsync(request);
-                return ApiCreated(newUser);
+                return Api201(newUser);
             }
             catch (Exception ex)
             {
-                return ApiBadRequest<object>(ex.Message);
+                return Api400<UserResponseDto>(ex.Message);
             }
         }
 
@@ -122,17 +124,17 @@ namespace MathslideLearning.Controllers
         {
             if (!ModelState.IsValid)
             {
-                return ApiBadRequest<ModelStateDictionary>(ModelState, "Validation failed");
+                return Api400<object>("Validation failed", ModelState);
             }
 
             try
             {
                 var token = await _userService.LoginAsync(request);
-                return ApiOk(new { token });
+                return Api200<object>(new { token });
             }
             catch (Exception ex)
             {
-                return ApiUnauthorized<object>(ex.Message);
+                return Api401<object>(ex.Message);
             }
         }
     }

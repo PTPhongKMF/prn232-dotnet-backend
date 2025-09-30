@@ -25,7 +25,7 @@ namespace MathslideLearning.Controllers
         public async Task<IActionResult> GetAllUsers()
         {
             var users = await _userService.GetAllUsersAsync();
-            return ApiOk(users);
+            return Api200(users);
         }
 
         [HttpPut("users/{id}/permissions")]
@@ -33,21 +33,21 @@ namespace MathslideLearning.Controllers
         {
             if (!ModelState.IsValid)
             {
-                return ApiBadRequest<ModelStateDictionary>(ModelState, "Validation failed");
+                return Api400<ModelStateDictionary>("Validation failed", ModelState);
             }
 
             try
             {
                 var updatedUser = await _userService.AdminUpdateUserAsync(id, request);
-                return ApiOk(updatedUser);
+                return Api200(updatedUser);
             }
             catch (Exception ex)
             {
                 if (ex.Message.Contains("not found"))
                 {
-                    return ApiNotFound<object>(ex.Message);
+                    return Api404<object>(ex.Message);
                 }
-                return ApiBadRequest<object>(ex.Message);
+                return Api400<object>(ex.Message);
             }
         }
     }

@@ -25,7 +25,7 @@ namespace MathslideLearning.Controllers
         public async Task<IActionResult> GetAll()
         {
             var questions = await _questionService.GetAllQuestionsAsync();
-            return ApiOk(questions);
+            return Api200(questions);
         }
 
         [HttpGet("{id}")]
@@ -35,11 +35,11 @@ namespace MathslideLearning.Controllers
             try
             {
                 var question = await _questionService.GetQuestionByIdAsync(id);
-                return ApiOk(question);
+                return Api200(question);
             }
             catch (Exception ex)
             {
-                return ApiNotFound<object>(ex.Message);
+                return Api404<object>(ex.Message);
             }
         }
 
@@ -49,17 +49,17 @@ namespace MathslideLearning.Controllers
         {
             if (!ModelState.IsValid)
             {
-                return ApiBadRequest<ModelStateDictionary>(ModelState, "Validation failed");
+                return Api400<ModelStateDictionary>("Validation failed", ModelState);
             }
 
             try
             {
                 var newQuestion = await _questionService.CreateQuestionAsync(request);
-                return ApiCreated(newQuestion);
+                return Api201(newQuestion);
             }
             catch (Exception ex)
             {
-                return ApiBadRequest<object>(new { message = ex.Message });
+                return Api400<object>(ex.Message, new { message = ex.Message });
             }
         }
 
@@ -69,17 +69,17 @@ namespace MathslideLearning.Controllers
         {
             if (!ModelState.IsValid)
             {
-                return ApiBadRequest<ModelStateDictionary>(ModelState, "Validation failed");
+                return Api400<ModelStateDictionary>("Validation failed", ModelState);
             }
 
             try
             {
                 var updatedQuestion = await _questionService.UpdateQuestionAsync(id, request);
-                return ApiOk(updatedQuestion);
+                return Api200(updatedQuestion);
             }
             catch (Exception ex)
             {
-                return ApiBadRequest<object>(new { message = ex.Message });
+                return Api400<object>(ex.Message, new { message = ex.Message });
             }
         }
 
@@ -92,13 +92,13 @@ namespace MathslideLearning.Controllers
                 var success = await _questionService.DeleteQuestionAsync(id);
                 if (!success)
                 {
-                    return ApiNotFound<object>("Question not found");
+                    return Api404<object>("Question not found");
                 }
-                return ApiOk<object>(null, "Question deleted successfully");
+                return Api200<object>("Question deleted successfully", null);
             }
             catch (Exception ex)
             {
-                return ApiBadRequest<object>(new { message = ex.Message });
+                return Api400<object>(ex.Message, new { message = ex.Message });
             }
         }
     }
