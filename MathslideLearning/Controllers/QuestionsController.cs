@@ -28,6 +28,26 @@ namespace MathslideLearning.Controllers
             return Api200(questions);
         }
 
+        [HttpGet("filtered")]
+        [Authorize(Roles = "Admin,Teacher")]
+        public async Task<IActionResult> GetFilteredPaged([FromQuery] FilteredPagedQuestionRequestDto request)
+        {
+            if (!ModelState.IsValid)
+            {
+                return Api400<ModelStateDictionary>("Validation failed", ModelState);
+            }
+
+            try
+            {
+                var questions = await _questionService.GetFilteredPagedQuestionsAsync(request);
+                return Api200(questions);
+            }
+            catch (Exception ex)
+            {
+                return Api400<object>(ex.Message, new { message = ex.Message });
+            }
+        }
+
         [HttpGet("{id}")]
         [Authorize(Roles = "Admin,Teacher")]
         public async Task<IActionResult> GetById(int id)

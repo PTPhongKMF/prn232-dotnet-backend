@@ -1,8 +1,9 @@
-﻿using MathslideLearning.Business.Interfaces;
+﻿using AutoMapper;
+using MathslideLearning.Business.Interfaces;
 using MathslideLearning.Data.Entities;
 using MathslideLearning.Data.Interfaces;
+using MathslideLearning.Models.PagnitionDtos;
 using MathslideLearning.Models.QuestionDtos;
-using MathslideLearning.Models.TagDtos;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -13,10 +14,12 @@ namespace MathslideLearning.Business.Services
     public class QuestionService : IQuestionService
     {
         private readonly IQuestionRepository _questionRepository;
+        private readonly IMapper _mapper;
 
-        public QuestionService(IQuestionRepository questionRepository)
+        public QuestionService(IQuestionRepository questionRepository, IMapper mapper)
         {
             _questionRepository = questionRepository;
+            _mapper = mapper;
         }
 
         public async Task<QuestionResponseDto> CreateQuestionAsync(QuestionRequestDto request)
@@ -35,7 +38,7 @@ namespace MathslideLearning.Business.Services
             };
 
             var createdQuestion = await _questionRepository.CreateAsync(newQuestion);
-            return await GetQuestionByIdAsync(createdQuestion.Id);
+            return _mapper.Map<QuestionResponseDto>(createdQuestion);
         }
 
         public async Task<QuestionResponseDto> GetQuestionByIdAsync(int id)
@@ -45,13 +48,13 @@ namespace MathslideLearning.Business.Services
             {
                 throw new Exception("Question not found.");
             }
-            return MapToResponseDto(question);
+            return _mapper.Map<QuestionResponseDto>(question);
         }
 
         public async Task<IEnumerable<QuestionResponseDto>> GetAllQuestionsAsync()
         {
             var questions = await _questionRepository.GetAllAsync();
-            return questions.Select(MapToResponseDto);
+            return _mapper.Map<IEnumerable<QuestionResponseDto>>(questions);
         }
 
         public async Task<QuestionResponseDto> UpdateQuestionAsync(int id, QuestionRequestDto request)
@@ -83,7 +86,7 @@ namespace MathslideLearning.Business.Services
             }
 
             var updatedQuestion = await _questionRepository.UpdateAsync(questionToUpdate);
-            return await GetQuestionByIdAsync(updatedQuestion.Id);
+            return _mapper.Map<QuestionResponseDto>(updatedQuestion);
         }
 
         public async Task<bool> DeleteQuestionAsync(int id)
@@ -91,15 +94,27 @@ namespace MathslideLearning.Business.Services
             return await _questionRepository.DeleteAsync(id);
         }
 
-        private QuestionResponseDto MapToResponseDto(Question question)
+        public async Task<PagedResult<QuestionResponseDto>> GetFilteredPagedQuestionsAsync(FilteredPagedQuestionRequestDto request)
         {
-            return new QuestionResponseDto
+            var skip = (request.PageNumber - 1) * request.PageSize;
+            var (items, totalCount) = await _questionRepository.GetFilteredQuestionsAsync(
+                request.SearchTerm,
+                request.TagIds,
+                request.SortByDateDescending,
+                skip,
+                request.PageSize);
+            
+            var totalPages = (int)Math.Ceiling(totalCount / (double)request.PageSize);
+            
+            return new PagedResult<QuestionResponseDto>
             {
-                Id = question.Id,
-                Content = question.Content,
-                Type = question.Type,
-                Answers = question.Answers.Select(a => new AnswerDto { Content = a.Content, IsCorrect = a.IsCorrect }).ToList(),
-                Tags = question.QuestionTags.Select(qt => new TagDto { Id = qt.TagId, Name = qt.Tag.Name }).ToList()
+                Results = _mapper.Map<IEnumerable<QuestionResponseDto>>(items),
+                Pagnition = new PaginationDto
+                {
+                    PageNumber = request.PageNumber,
+                    PageSize = request.PageSize,
+                    TotalPages = totalPages
+                }
             };
         }
     }

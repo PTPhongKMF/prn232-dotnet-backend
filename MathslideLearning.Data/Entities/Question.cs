@@ -9,6 +9,7 @@ namespace MathslideLearning.Data.Entities
         public string Content { get; set; }
         public string Type { get; set; }
         public int TeacherId { get; set; }
+        public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 
         public virtual User Teacher { get; set; }
         public virtual ICollection<Answer> Answers { get; set; } = new List<Answer>();

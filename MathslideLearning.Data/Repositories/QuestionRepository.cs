@@ -1,8 +1,11 @@
 ﻿using MathslideLearning.Data.DbContext;
 using MathslideLearning.Data.Entities;
 using MathslideLearning.Data.Interfaces;
-using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
+using Microsoft.EntityFrameworkCore;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace MathslideLearning.Data.Repositories
@@ -56,6 +59,48 @@ namespace MathslideLearning.Data.Repositories
             _context.Questions.Remove(question);
             await _context.SaveChangesAsync();
             return true;
+        }
+
+        public async Task<(IEnumerable<Question> items, int totalCount)> GetFilteredQuestionsAsync(
+            string? searchTerm,
+            IEnumerable<int>? tagIds,
+            bool sortByDateDescending,
+            int skip,
+            int take)
+        {
+            var query = _context.Questions
+                .Include(q => q.Answers)
+                .Include(q => q.QuestionTags)
+                    .ThenInclude(qt => qt.Tag)
+                .AsQueryable();
+
+            // Apply search filter
+            if (!string.IsNullOrWhiteSpace(searchTerm))
+            {
+                query = query.Where(q => q.Content.Contains(searchTerm));
+            }
+
+            // Apply tag filter
+            if (tagIds != null && tagIds.Any())
+            {
+                query = query.Where(q => q.QuestionTags.Any(qt => tagIds.Contains(qt.TagId)));
+            }
+
+            // Apply sorting
+            query = sortByDateDescending
+                ? query.OrderByDescending(q => q.CreatedAt)
+                : query.OrderBy(q => q.CreatedAt);
+
+            // Get total count
+            var totalCount = await query.CountAsync();
+
+            // Apply pagination
+            var items = await query
+                .Skip(skip)
+                .Take(take)
+                .ToListAsync();
+
+            return (items, totalCount);
         }
     }
 }

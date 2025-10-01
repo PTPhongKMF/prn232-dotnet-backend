@@ -11,5 +11,11 @@ namespace MathslideLearning.Data.Interfaces
         Task<Question> CreateAsync(Question question);
         Task<Question> UpdateAsync(Question question);
         Task<bool> DeleteAsync(int id);
+        Task<(IEnumerable<Question> items, int totalCount)> GetFilteredQuestionsAsync(
+            string? searchTerm,
+            IEnumerable<int>? tagIds,
+            bool sortByDateDescending,
+            int skip,
+            int take);
     }
 }

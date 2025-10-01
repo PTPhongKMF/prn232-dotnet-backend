@@ -1,4 +1,5 @@
-﻿using MathslideLearning.Models.QuestionDtos;
+﻿using MathslideLearning.Models.PagnitionDtos;
+using MathslideLearning.Models.QuestionDtos;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
@@ -11,5 +12,6 @@ namespace MathslideLearning.Business.Interfaces
         Task<IEnumerable<QuestionResponseDto>> GetAllQuestionsAsync();
         Task<QuestionResponseDto> UpdateQuestionAsync(int id, QuestionRequestDto request);
         Task<bool> DeleteQuestionAsync(int id);
+        Task<PagedResult<QuestionResponseDto>> GetFilteredPagedQuestionsAsync(FilteredPagedQuestionRequestDto request);
     }
 }
