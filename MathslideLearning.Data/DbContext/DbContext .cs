@@ -89,6 +89,12 @@ namespace MathslideLearning.Data.DbContext
                 .HasOne(qt => qt.Tag)
                 .WithMany(t => t.QuestionTags)
                 .HasForeignKey(qt => qt.TagId);
+
+            modelBuilder.Entity<Question>()
+                .HasOne(q => q.Teacher)
+                .WithMany(u => u.CreatedQuestions)
+                .HasForeignKey(q => q.TeacherId)
+                .OnDelete(DeleteBehavior.Restrict);
         }
     }
 }
