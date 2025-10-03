@@ -2,6 +2,7 @@
 using MathslideLearning.Data.Entities;
 using MathslideLearning.Data.Interfaces;
 using MathslideLearning.Models.SlideDtos;
+using Microsoft.AspNetCore.Http;
 using System;
 using System.Linq;
 using System.Threading.Tasks;
@@ -11,12 +12,41 @@ namespace MathslideLearning.Business.Services
     public class SlideService : ISlideService
     {
         private readonly ISlideRepository _slideRepository;
+        private readonly IFileService _fileService;
 
-        public SlideService(ISlideRepository slideRepository)
+        public SlideService(ISlideRepository slideRepository, IFileService fileService)
         {
             _slideRepository = slideRepository;
+            _fileService = fileService;
         }
-        public async Task<Slide> UpdateSlideAsync(int slideId, SlideUpdateDto slideDto, int teacherId)
+
+        public async Task<Slide> CreateSlideAsync(SlideCreateDto slideDto, int teacherId, IFormFile file)
+        {
+            var fileUrl = await _fileService.SaveFileAsync(file, "slides");
+
+            var newSlide = new Slide
+            {
+                TeacherId = teacherId,
+                Title = slideDto.Title,
+                Topic = slideDto.Topic,
+                ContentType = file.ContentType,
+                FileUrl = fileUrl,
+                Price = slideDto.Price,
+                Grade = slideDto.Grade,
+                IsPublished = slideDto.IsPublished,
+                CreatedAt = DateTime.UtcNow,
+                SlidePages = slideDto.SlidePages.Select(p => new SlidePage
+                {
+                    OrderNumber = p.OrderNumber,
+                    Title = p.Title,
+                    Content = p.Content
+                }).ToList()
+            };
+
+            return await _slideRepository.CreateSlideAsync(newSlide);
+        }
+
+        public async Task<Slide> UpdateSlideAsync(int slideId, SlideUpdateDto slideDto, int teacherId, IFormFile? file)
         {
             var slideToUpdate = await _slideRepository.GetSlideByIdAsync(slideId);
             if (slideToUpdate == null)
@@ -29,13 +59,18 @@ namespace MathslideLearning.Business.Services
                 throw new UnauthorizedAccessException("You are not authorized to edit this slide.");
             }
 
+            if (file != null)
+            {
+                _fileService.DeleteFile(slideToUpdate.FileUrl);
+                slideToUpdate.FileUrl = await _fileService.SaveFileAsync(file, "slides");
+                slideToUpdate.ContentType = file.ContentType;
+            }
+
             slideToUpdate.Title = slideDto.Title;
             slideToUpdate.Topic = slideDto.Topic;
-            slideToUpdate.ContentType = slideDto.ContentType;
             slideToUpdate.Price = slideDto.Price;
             slideToUpdate.Grade = slideDto.Grade;
             slideToUpdate.IsPublished = slideDto.IsPublished;
-
             slideToUpdate.SlidePages.Clear();
             foreach (var pageDto in slideDto.SlidePages)
             {
@@ -63,34 +98,13 @@ namespace MathslideLearning.Business.Services
                 throw new UnauthorizedAccessException("You are not authorized to delete this slide.");
             }
 
+            _fileService.DeleteFile(slideToDelete.FileUrl);
             return await _slideRepository.DeleteSlideAsync(slideId);
         }
 
         public async Task<IEnumerable<Slide>> GetSlidesByTeacherIdAsync(int teacherId)
         {
             return await _slideRepository.GetSlidesByTeacherIdAsync(teacherId);
-        }
-        public async Task<Slide> CreateSlideAsync(SlideCreateDto slideDto, int teacherId)
-        {
-            var newSlide = new Slide
-            {
-                TeacherId = teacherId,
-                Title = slideDto.Title,
-                Topic = slideDto.Topic,
-                ContentType = slideDto.ContentType,
-                Price = slideDto.Price,
-                Grade = slideDto.Grade,
-                IsPublished = slideDto.IsPublished,
-                CreatedAt = DateTime.UtcNow,
-                SlidePages = slideDto.SlidePages.Select(p => new SlidePage
-                {
-                    OrderNumber = p.OrderNumber,
-                    Title = p.Title,
-                    Content = p.Content
-                }).ToList()
-            };
-
-            return await _slideRepository.CreateSlideAsync(newSlide);
         }
     }
 }

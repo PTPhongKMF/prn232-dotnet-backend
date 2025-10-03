@@ -2,10 +2,12 @@
 using MathslideLearning.Controllers.Base;
 using MathslideLearning.Models.SlideDtos;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using System;
 using System.Security.Claims;
+using System.Text.Json;
 using System.Threading.Tasks;
 
 namespace MathslideLearning.Controllers
@@ -32,6 +34,72 @@ namespace MathslideLearning.Controllers
             return int.Parse(userIdString);
         }
 
+        [HttpPost]
+        [Authorize(Roles = "Teacher")]
+        [Consumes("multipart/form-data")]
+        public async Task<IActionResult> CreateSlide([FromForm] string slideDtoStr, [FromForm] IFormFile file)
+        {
+            if (string.IsNullOrEmpty(slideDtoStr))
+            {
+                return Api400<object>("Slide data is required.");
+            }
+
+            var slideDto = JsonSerializer.Deserialize<SlideCreateDto>(slideDtoStr, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+
+            if (!ModelState.IsValid)
+            {
+                return Api400<ModelStateDictionary>("Validation failed", ModelState);
+            }
+
+            try
+            {
+                var teacherId = GetTeacherId();
+                var createdSlide = await _slideService.CreateSlideAsync(slideDto, teacherId, file);
+                return Api201(createdSlide);
+            }
+            catch (UnauthorizedAccessException ex)
+            {
+                return Api401<object>(ex.Message);
+            }
+            catch (Exception ex)
+            {
+                return Api400<object>($"An error occurred while creating the slide: {ex.Message}", new { message = $"An error occurred while creating the slide: {ex.Message}" });
+            }
+        }
+
+        [HttpPut("{id}")]
+        [Authorize(Roles = "Teacher")]
+        [Consumes("multipart/form-data")]
+        public async Task<IActionResult> UpdateSlide(int id, [FromForm] string slideDtoStr, [FromForm] IFormFile? file)
+        {
+            if (string.IsNullOrEmpty(slideDtoStr))
+            {
+                return Api400<object>("Slide data is required.");
+            }
+
+            var slideDto = JsonSerializer.Deserialize<SlideUpdateDto>(slideDtoStr, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+
+            if (!ModelState.IsValid)
+            {
+                return Api400<ModelStateDictionary>("Validation failed", ModelState);
+            }
+
+            try
+            {
+                var teacherId = GetTeacherId();
+                var updatedSlide = await _slideService.UpdateSlideAsync(id, slideDto, teacherId, file);
+                return Api200(updatedSlide);
+            }
+            catch (UnauthorizedAccessException ex)
+            {
+                return Api403<object>(ex.Message);
+            }
+            catch (Exception ex)
+            {
+                return Api404<object>(ex.Message);
+            }
+        }
+
         [HttpGet("my-slides")]
         [Authorize(Roles = "Teacher")]
         public async Task<IActionResult> GetMySlides()
@@ -45,31 +113,6 @@ namespace MathslideLearning.Controllers
             catch (UnauthorizedAccessException ex)
             {
                 return Api401<object>(ex.Message);
-            }
-        }
-
-        [HttpPut("{id}")]
-        [Authorize(Roles = "Teacher")]
-        public async Task<IActionResult> UpdateSlide(int id, [FromBody] SlideUpdateDto slideDto)
-        {
-            if (!ModelState.IsValid)
-            {
-                return Api400<ModelStateDictionary>("Validation failed", ModelState);
-            }
-
-            try
-            {
-                var teacherId = GetTeacherId();
-                var updatedSlide = await _slideService.UpdateSlideAsync(id, slideDto, teacherId);
-                return Api200(updatedSlide);
-            }
-            catch (UnauthorizedAccessException ex)
-            {
-                return Api403<object>(ex.Message);
-            }
-            catch (Exception ex)
-            {
-                return Api404<object>(ex.Message);
             }
         }
 
@@ -94,31 +137,6 @@ namespace MathslideLearning.Controllers
             catch (Exception ex)
             {
                 return Api404<object>(ex.Message);
-            }
-        }
-
-        [HttpPost]
-        [Authorize(Roles = "Teacher")]
-        public async Task<IActionResult> CreateSlide([FromBody] SlideCreateDto slideDto)
-        {
-            if (!ModelState.IsValid)
-            {
-                return Api400<ModelStateDictionary>("Validation failed", ModelState);
-            }
-
-            try
-            {
-                var teacherId = GetTeacherId();
-                var createdSlide = await _slideService.CreateSlideAsync(slideDto, teacherId);
-                return Api201(createdSlide);
-            }
-            catch (UnauthorizedAccessException ex)
-            {
-                return Api401<object>(ex.Message);
-            }
-            catch (Exception ex)
-            {
-                return Api400<object>($"An error occurred while creating the slide: {ex.Message}", new { message = $"An error occurred while creating the slide: {ex.Message}" });
             }
         }
     }

@@ -1,4 +1,3 @@
-using System.Text;
 using DotNetEnv;
 using MathslideLearning.Business.AutoMapper;
 using MathslideLearning.Business.Interfaces;
@@ -8,8 +7,10 @@ using MathslideLearning.Data.Interfaces;
 using MathslideLearning.Data.Repositories;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.FileProviders;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -43,6 +44,7 @@ builder.Services.AddScoped<ITagService, TagService>();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IExamService, ExamService>();
 builder.Services.AddScoped<IQuestionService, QuestionService>();
+builder.Services.AddScoped<IFileService, FileService>();
 
 // ===== Repositories =====
 builder.Services.AddScoped<IPaymentMethodRepository, PaymentMethodRepository>();
@@ -143,6 +145,13 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+
+app.UseStaticFiles(new StaticFileOptions
+{
+    FileProvider = new PhysicalFileProvider(
+           Path.Combine(builder.Environment.ContentRootPath, "wwwroot")),
+    RequestPath = ""
+});
 app.UseCors("AllowedOrigins");
 
 app.UseAuthentication();
