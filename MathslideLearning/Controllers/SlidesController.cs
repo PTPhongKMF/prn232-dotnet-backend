@@ -116,6 +116,14 @@ namespace MathslideLearning.Controllers
             }
         }
 
+        [HttpGet("user/{userId}")]
+        [AllowAnonymous]
+        public async Task<IActionResult> GetSlidesByUserId(int userId)
+        {
+            var slides = await _slideService.GetSlidesByTeacherIdAsync(userId);
+            return Api200(slides);
+        }
+
         [HttpDelete("{id}")]
         [Authorize(Roles = "Teacher")]
         public async Task<IActionResult> DeleteSlide(int id)
