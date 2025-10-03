@@ -19,7 +19,27 @@ namespace MathslideLearning.Business.Services
             _slideRepository = slideRepository;
             _fileService = fileService;
         }
+        public async Task<IEnumerable<Slide>> GetAllPublicSlidesAsync()
+        {
+            return await _slideRepository.GetAllPublicSlidesAsync();
+        }
+        public async Task<Slide> UpdateSlideStatusAsync(int slideId, int teacherId, bool isPublished)
+        {
+            var slideToUpdate = await _slideRepository.GetSlideByIdAsync(slideId);
+            if (slideToUpdate == null)
+            {
+                throw new Exception("Slide not found.");
+            }
 
+            if (slideToUpdate.TeacherId != teacherId)
+            {
+                throw new UnauthorizedAccessException("You are not authorized to edit this slide.");
+            }
+
+            slideToUpdate.IsPublished = isPublished;
+
+            return await _slideRepository.UpdateSlideAsync(slideToUpdate);
+        }
         public async Task<Slide> CreateSlideAsync(SlideCreateDto slideDto, int teacherId, IFormFile file)
         {
             var fileUrl = await _fileService.SaveFileAsync(file, "slides");

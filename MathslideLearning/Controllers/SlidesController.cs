@@ -23,7 +23,38 @@ namespace MathslideLearning.Controllers
         {
             _slideService = slideService;
         }
+        [HttpGet("public")]
+        [AllowAnonymous]
+        public async Task<IActionResult> GetAllPublicSlides()
+        {
+            var slides = await _slideService.GetAllPublicSlidesAsync();
+            return Api200(slides);
+        }
 
+        [HttpPatch("{id}/status")]
+        [Authorize(Roles = "Teacher")]
+        public async Task<IActionResult> UpdateSlideStatus(int id, [FromBody] SlideStatusUpdateDto request)
+        {
+            if (!ModelState.IsValid)
+            {
+                return Api400<ModelStateDictionary>("Validation failed", ModelState);
+            }
+
+            try
+            {
+                var teacherId = GetTeacherId();
+                var updatedSlide = await _slideService.UpdateSlideStatusAsync(id, teacherId, request.IsPublished);
+                return Api200(updatedSlide);
+            }
+            catch (UnauthorizedAccessException ex)
+            {
+                return Api403<object>(ex.Message);
+            }
+            catch (Exception ex)
+            {
+                return Api404<object>(ex.Message);
+            }
+        }
         private int GetTeacherId()
         {
             var userIdString = User.FindFirstValue(ClaimTypes.NameIdentifier);
