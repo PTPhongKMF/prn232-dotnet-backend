@@ -20,6 +20,7 @@ namespace MathslideLearning.Data.Repositories
         {
             return await _context.Slides
                 .Include(s => s.Teacher)
+                .Include(s => s.SlidePages)
                 .Where(s => s.IsPublished)
                 .AsNoTracking()
                 .ToListAsync();
