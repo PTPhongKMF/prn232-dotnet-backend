@@ -1,8 +1,6 @@
 ﻿using MathslideLearning.Business.Interfaces;
 using MathslideLearning.Data.Entities;
 using MathslideLearning.Data.Interfaces;
-using MathslideLearning.Models;
-using MathslideLearning.Models.AccountsDtos;
 using MathslideLearning.Models.PaymentDtos;
 using System;
 using System.Collections.Generic;
@@ -72,7 +70,12 @@ namespace MathslideLearning.Business.Services
                 TotalPrice = calculatedTotalPrice,
                 Status = fullReceipt.Status,
                 CreatedAt = fullReceipt.CreatedAt,
-                PurchasedSlideTitles = fullReceipt.ReceiptDetails.Select(rd => rd.Slide.Title).ToList()
+                PurchasedItems = fullReceipt.ReceiptDetails.Select(rd => new PurchasedItemDto
+                {
+                    SlideId = rd.SlideId,
+                    Title = rd.Slide.Title,
+                    FileUrl = rd.Slide.FileUrl
+                }).ToList()
             };
         }
         public async Task<ReceiptResponseDto> UpdateReceiptStatusAsync(int receiptId, string status)
@@ -97,7 +100,12 @@ namespace MathslideLearning.Business.Services
                 TotalPrice = totalPrice,
                 Status = fullReceipt.Status,
                 CreatedAt = fullReceipt.CreatedAt,
-                PurchasedSlideTitles = fullReceipt.ReceiptDetails.Select(rd => rd.Slide.Title).ToList()
+                PurchasedItems = fullReceipt.ReceiptDetails.Select(rd => new PurchasedItemDto
+                {
+                    SlideId = rd.SlideId,
+                    Title = rd.Slide.Title,
+                    FileUrl = rd.Slide.FileUrl
+                }).ToList()
             };
         }
 
@@ -105,20 +113,27 @@ namespace MathslideLearning.Business.Services
         {
             var receipts = await _receiptRepository.GetReceiptsByUserIdAsync(studentId);
 
-            return receipts.Select(receipt =>
-            {
-                var totalPrice = receipt.ReceiptDetails.Sum(rd => rd.Slide.Price);
-                return new ReceiptResponseDto
+            return receipts
+                .Where(receipt => receipt.Status == "Paid") 
+                .Select(receipt =>
                 {
-                    Id = receipt.Id,
-                    UserId = receipt.UserId,
-                    PaymentMethod = receipt.PaymentMethod?.Name ?? "N/A",
-                    TotalPrice = totalPrice,
-                    Status = receipt.Status,
-                    CreatedAt = receipt.CreatedAt,
-                    PurchasedSlideTitles = receipt.ReceiptDetails.Select(rd => rd.Slide.Title).ToList()
-                };
-            });
+                    var totalPrice = receipt.ReceiptDetails.Sum(rd => rd.Slide.Price);
+                    return new ReceiptResponseDto
+                    {
+                        Id = receipt.Id,
+                        UserId = receipt.UserId,
+                        PaymentMethod = receipt.PaymentMethod?.Name ?? "N/A",
+                        TotalPrice = totalPrice,
+                        Status = receipt.Status,
+                        CreatedAt = receipt.CreatedAt,
+                        PurchasedItems = receipt.ReceiptDetails.Select(rd => new PurchasedItemDto
+                        {
+                            SlideId = rd.SlideId,
+                            Title = rd.Slide.Title,
+                            FileUrl = rd.Slide.FileUrl
+                        }).ToList()
+                    };
+                });
         }
     }
 }
