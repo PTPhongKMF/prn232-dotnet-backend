@@ -56,7 +56,7 @@ namespace MathslideLearning.Business.Services
             {
                 UserId = studentId,
                 PaymentMethodId = purchaseRequest.PaymentMethodId,
-                Status = "Completed",
+                Status = "Pending",
                 CreatedAt = DateTime.UtcNow,
                 ReceiptDetails = slidesToPurchase.Select(s => new ReceiptDetail { SlideId = s.Id }).ToList()
             };
@@ -70,6 +70,31 @@ namespace MathslideLearning.Business.Services
                 UserId = fullReceipt.UserId,
                 PaymentMethod = fullReceipt.PaymentMethod?.Name ?? "N/A",
                 TotalPrice = calculatedTotalPrice,
+                Status = fullReceipt.Status,
+                CreatedAt = fullReceipt.CreatedAt,
+                PurchasedSlideTitles = fullReceipt.ReceiptDetails.Select(rd => rd.Slide.Title).ToList()
+            };
+        }
+        public async Task<ReceiptResponseDto> UpdateReceiptStatusAsync(int receiptId, string status)
+        {
+            var receiptToUpdate = await _receiptRepository.GetReceiptByIdAsync(receiptId);
+            if (receiptToUpdate == null)
+            {
+                throw new Exception("Receipt not found.");
+            }
+
+            receiptToUpdate.Status = status;
+            await _receiptRepository.UpdateReceiptAsync(receiptToUpdate);
+
+            var fullReceipt = await _receiptRepository.GetReceiptByIdAsync(receiptId);
+            var totalPrice = fullReceipt.ReceiptDetails.Sum(rd => rd.Slide.Price);
+
+            return new ReceiptResponseDto
+            {
+                Id = fullReceipt.Id,
+                UserId = fullReceipt.UserId,
+                PaymentMethod = fullReceipt.PaymentMethod?.Name ?? "N/A",
+                TotalPrice = totalPrice,
                 Status = fullReceipt.Status,
                 CreatedAt = fullReceipt.CreatedAt,
                 PurchasedSlideTitles = fullReceipt.ReceiptDetails.Select(rd => rd.Slide.Title).ToList()

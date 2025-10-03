@@ -41,7 +41,26 @@ namespace MathslideLearning.Controllers
                 return Api400<object>(ex.Message, new { message = ex.Message });
             }
         }
+        [HttpPatch("{receiptId}/status")]
+        public async Task<IActionResult> UpdateReceiptStatus(int receiptId, [FromBody] ReceiptStatusUpdateDto request)
+        {
+            if (!ModelState.IsValid)
+            {
+                return Api400<ModelStateDictionary>("Validation failed", ModelState);
+            }
 
+            try
+            {
+                var studentId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
+                var receipt = await _purchaseService.UpdateReceiptStatusAsync(receiptId, request.Status);
+
+                return Api200(receipt);
+            }
+            catch (Exception ex)
+            {
+                return Api400<object>(ex.Message, new { message = ex.Message });
+            }
+        }
         [HttpGet("history")]
         public async Task<IActionResult> GetMyPurchaseHistory()
         {
