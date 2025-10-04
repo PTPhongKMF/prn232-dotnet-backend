@@ -11,6 +11,7 @@ namespace MathslideLearning.Data.Entities
         public string Password { get; set; }
         public string Role { get; set; }
         public int? Grade { get; set; }
+        public bool IsDeleted { get; set; } = false;
 
         public virtual ICollection<Slide> CreatedSlides { get; set; } = new List<Slide>();
         public virtual ICollection<Question> CreatedQuestions { get; set; } = new List<Question>();

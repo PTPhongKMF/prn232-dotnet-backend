@@ -10,7 +10,7 @@ namespace MathslideLearning.Business.Interfaces
         Task<User> RegisterAsync(RegisterRequestDto request);
         Task<LoginResponseDto> LoginAsync(LoginRequestDto request);
         Task<UserResponseDto> UpdateUserAsync(int userId, UpdateUserRequestDto request);
-        Task<bool> DeleteUserAsync(int userId);
+        Task<bool> SoftDeleteUserAsync(int userId);
         Task<UserResponseDto> AdminUpdateUserAsync(int userId, AdminUpdateUserRequestDto request);
 
         // --- New Methods ---

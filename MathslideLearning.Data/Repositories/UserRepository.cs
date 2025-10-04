@@ -47,11 +47,15 @@ namespace MathslideLearning.Data.Repositories
             await _context.SaveChangesAsync();
         }
 
-        public async Task<bool> DeleteUserAsync(int id)
+        public async Task<bool> SoftDeleteUserAsync(int id)
         {
             var user = await GetUserByIdAsync(id);
             if (user == null) return false;
-            _context.Users.Remove(user);
+            
+            user.IsDeleted = true;
+            user.Email = string.Empty;
+            
+            _context.Users.Update(user);
             await _context.SaveChangesAsync();
             return true;
         }

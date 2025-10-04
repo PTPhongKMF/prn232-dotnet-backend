@@ -57,7 +57,7 @@ namespace MathslideLearning.Controllers
                     return Api401<object>("Invalid token");
                 }
 
-                var result = await _userService.DeleteUserAsync(userId);
+                var result = await _userService.SoftDeleteUserAsync(userId);
 
                 if (!result)
                 {

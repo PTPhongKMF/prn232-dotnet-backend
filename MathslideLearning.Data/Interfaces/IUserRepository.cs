@@ -11,7 +11,7 @@ namespace MathslideLearning.Data.Interfaces
         Task<IEnumerable<User>> GetAllUsersAsync();
         Task<User> CreateUserAsync(User user);
         Task UpdateUserAsync(User user);
-        Task<bool> DeleteUserAsync(int id);
+        Task<bool> SoftDeleteUserAsync(int id);
     }
 }
 

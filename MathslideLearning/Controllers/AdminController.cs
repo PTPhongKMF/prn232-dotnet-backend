@@ -55,7 +55,7 @@ namespace MathslideLearning.Controllers
         {
             try
             {
-                var success = await _userService.DeleteUserAsync(id);
+                var success = await _userService.SoftDeleteUserAsync(id);
                 if (!success)
                 {
                     return Api404<object>("User not found");

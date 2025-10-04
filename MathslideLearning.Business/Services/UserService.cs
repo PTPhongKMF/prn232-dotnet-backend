@@ -49,9 +49,9 @@ namespace MathslideLearning.Business.Services
             };
         }
 
-        public async Task<bool> DeleteUserAsync(int userId)
+        public async Task<bool> SoftDeleteUserAsync(int userId)
         {
-            return await _userRepository.DeleteUserAsync(userId);
+            return await _userRepository.SoftDeleteUserAsync(userId);
         }
         public async Task<UserResponseDto> UpdateUserAsync(int userId, UpdateUserRequestDto request)
         {
