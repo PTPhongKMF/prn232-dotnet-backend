@@ -12,5 +12,6 @@ namespace MathslideLearning.Models.PaymentDtos
         public string Status { get; set; }
         public DateTime CreatedAt { get; set; }
         public List<string> PurchasedSlideTitles { get; set; }
+        public List<PurchasedItemDto> PurchasedItems { get; set; }
     }
 }

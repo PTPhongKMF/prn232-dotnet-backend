@@ -11,6 +11,7 @@ namespace MathslideLearning.Data.Interfaces
         Task<IEnumerable<Slide>> GetSlidesByTeacherIdAsync(int teacherId);
         Task<Slide> UpdateSlideAsync(Slide slide);
         Task<bool> DeleteSlideAsync(int slideId);
+        Task<IEnumerable<Slide>> GetAllPublicSlidesAsync();
     }
 }
 

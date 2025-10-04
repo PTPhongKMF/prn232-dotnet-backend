@@ -11,5 +11,6 @@ namespace MathslideLearning.Data.Interfaces
         Task<Receipt> GetReceiptByIdAsync(int receiptId);
         Task<IEnumerable<Receipt>> GetReceiptsByUserIdAsync(int userId);
         Task<IEnumerable<ReceiptDetail>> GetSalesByTeacherIdAsync(int teacherId);
+        Task<Receipt> UpdateReceiptAsync(Receipt receipt);
     }
 }

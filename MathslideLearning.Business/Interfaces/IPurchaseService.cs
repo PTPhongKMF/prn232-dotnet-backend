@@ -8,5 +8,6 @@ namespace MathslideLearning.Business.Interfaces
     {
         Task<ReceiptResponseDto> PurchaseSlidesAsync(int studentId, PurchaseRequestDto purchaseRequest);
         Task<IEnumerable<ReceiptResponseDto>> GetPurchaseHistoryAsync(int studentId);
+        Task<ReceiptResponseDto> UpdateReceiptStatusAsync(int receiptId, string status);
     }
 }

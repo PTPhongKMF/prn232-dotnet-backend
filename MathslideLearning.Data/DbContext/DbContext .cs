@@ -40,19 +40,19 @@ namespace MathslideLearning.Data.DbContext
                 .HasOne(s => s.Teacher)
                 .WithMany(u => u.CreatedSlides)
                 .HasForeignKey(s => s.TeacherId)
-                .OnDelete(DeleteBehavior.Restrict);
+                .OnDelete(DeleteBehavior.Cascade);
 
             modelBuilder.Entity<Exam>()
                 .HasOne(e => e.Teacher)
                 .WithMany(u => u.CreatedExams)
                 .HasForeignKey(e => e.TeacherId)
-                .OnDelete(DeleteBehavior.Restrict);
+                .OnDelete(DeleteBehavior.Cascade);
 
             modelBuilder.Entity<Receipt>()
                 .HasOne(r => r.User)
                 .WithMany(u => u.Receipts)
                 .HasForeignKey(r => r.UserId)
-                .OnDelete(DeleteBehavior.Restrict);
+                .OnDelete(DeleteBehavior.Cascade);
 
             modelBuilder.Entity<UserExamHistory>()
                 .HasOne(h => h.User)
@@ -63,7 +63,8 @@ namespace MathslideLearning.Data.DbContext
             modelBuilder.Entity<ReceiptDetail>()
                 .HasOne(rd => rd.Receipt)
                 .WithMany(r => r.ReceiptDetails)
-                .HasForeignKey(rd => rd.ReceiptId);
+                .HasForeignKey(rd => rd.ReceiptId)
+                .OnDelete(DeleteBehavior.Cascade);
 
             modelBuilder.Entity<ReceiptDetail>()
                 .HasOne(rd => rd.Slide)

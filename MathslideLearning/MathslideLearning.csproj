@@ -30,4 +30,8 @@
     <ProjectReference Include="..\MathslideLearning.Models\MathslideLearning.Models.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="wwwroot\" />
+  </ItemGroup>
+
 </Project>

@@ -375,7 +375,7 @@ namespace MathslideLearning.Data.Migrations
                     b.HasOne("MathslideLearning.Data.Entities.User", "Teacher")
                         .WithMany("CreatedExams")
                         .HasForeignKey("TeacherId")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("Teacher");
@@ -441,7 +441,7 @@ namespace MathslideLearning.Data.Migrations
                     b.HasOne("MathslideLearning.Data.Entities.User", "User")
                         .WithMany("Receipts")
                         .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("PaymentMethod");
@@ -473,7 +473,7 @@ namespace MathslideLearning.Data.Migrations
                     b.HasOne("MathslideLearning.Data.Entities.User", "Teacher")
                         .WithMany("CreatedSlides")
                         .HasForeignKey("TeacherId")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("Teacher");

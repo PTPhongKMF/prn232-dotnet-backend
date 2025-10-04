@@ -16,10 +16,17 @@ namespace MathslideLearning.Data.Repositories
         {
             _context = context;
         }
-
+        public async Task<IEnumerable<Slide>> GetAllPublicSlidesAsync()
+        {
+            return await _context.Slides
+                .Include(s => s.Teacher)
+                .Include(s => s.SlidePages)
+                .Where(s => s.IsPublished)
+                .AsNoTracking()
+                .ToListAsync();
+        }
         public async Task<Slide> GetSlideByIdAsync(int slideId)
         {
-            // We use Include() to also load the related SlidePages
             return await _context.Slides
                 .Include(s => s.SlidePages)
                 .FirstOrDefaultAsync(s => s.Id == slideId);

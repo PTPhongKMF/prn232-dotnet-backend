@@ -16,6 +16,14 @@ namespace MathslideLearning.Data.Repositories
         {
             _context = context;
         }
+
+        public async Task<Receipt> UpdateReceiptAsync(Receipt receipt)
+        {
+            _context.Receipts.Update(receipt);
+            await _context.SaveChangesAsync();
+            return receipt;
+        }
+
         public async Task<IEnumerable<ReceiptDetail>> GetSalesByTeacherIdAsync(int teacherId)
         {
             return await _context.ReceiptDetails
