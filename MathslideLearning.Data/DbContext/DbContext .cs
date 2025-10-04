@@ -63,7 +63,8 @@ namespace MathslideLearning.Data.DbContext
             modelBuilder.Entity<ReceiptDetail>()
                 .HasOne(rd => rd.Receipt)
                 .WithMany(r => r.ReceiptDetails)
-                .HasForeignKey(rd => rd.ReceiptId);
+                .HasForeignKey(rd => rd.ReceiptId)
+                .OnDelete(DeleteBehavior.Cascade);
 
             modelBuilder.Entity<ReceiptDetail>()
                 .HasOne(rd => rd.Slide)
