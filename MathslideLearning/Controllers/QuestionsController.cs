@@ -32,11 +32,6 @@ namespace MathslideLearning.Controllers
         [Authorize(Roles = "Admin,Teacher")]
         public async Task<IActionResult> GetFilteredPaged([FromQuery] FilteredPagedQuestionRequestDto request)
         {
-            if (!ModelState.IsValid)
-            {
-                return Api400<ModelStateDictionary>("Validation failed", ModelState);
-            }
-
             try
             {
                 var questions = await _questionService.GetFilteredPagedQuestionsAsync(request);

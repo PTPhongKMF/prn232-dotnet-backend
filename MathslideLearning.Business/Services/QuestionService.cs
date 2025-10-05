@@ -99,10 +99,12 @@ namespace MathslideLearning.Business.Services
             var skip = (request.PageNumber - 1) * request.PageSize;
             var (items, totalCount) = await _questionRepository.GetFilteredQuestionsAsync(
                 request.SearchTerm,
-                request.TagIds,
+                request.GetTagIdsList(),
                 request.SortByDateDescending,
                 skip,
-                request.PageSize);
+                request.PageSize,
+                request.From,
+                request.To);
             
             var totalPages = (int)Math.Ceiling(totalCount / (double)request.PageSize);
             

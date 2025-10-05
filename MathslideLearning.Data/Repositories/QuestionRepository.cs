@@ -25,6 +25,8 @@ namespace MathslideLearning.Data.Repositories
                 .Include(q => q.Answers)
                 .Include(q => q.QuestionTags)
                     .ThenInclude(qt => qt.Tag)
+                .Include(q => q.Teacher)
+                .Include(q => q.ExamQuestions)
                 .FirstOrDefaultAsync(q => q.Id == id);
         }
 
@@ -34,6 +36,8 @@ namespace MathslideLearning.Data.Repositories
                 .Include(q => q.Answers)
                 .Include(q => q.QuestionTags)
                     .ThenInclude(qt => qt.Tag)
+                .Include(q => q.Teacher)
+                .Include(q => q.ExamQuestions)
                 .ToListAsync();
         }
 
@@ -56,6 +60,11 @@ namespace MathslideLearning.Data.Repositories
             var question = await GetByIdAsync(id);
             if (question == null) return false;
 
+            if (question.ExamQuestions.Any())
+            {
+                throw new InvalidOperationException("Cannot delete question because it is being used in one or more exams.");
+            }
+
             _context.Questions.Remove(question);
             await _context.SaveChangesAsync();
             return true;
@@ -66,35 +75,44 @@ namespace MathslideLearning.Data.Repositories
             IEnumerable<int>? tagIds,
             bool sortByDateDescending,
             int skip,
-            int take)
+            int take,
+            DateTime? from = null,
+            DateTime? to = null)
         {
             var query = _context.Questions
                 .Include(q => q.Answers)
                 .Include(q => q.QuestionTags)
                     .ThenInclude(qt => qt.Tag)
+                .Include(q => q.Teacher)
+                .Include(q => q.ExamQuestions)
                 .AsQueryable();
 
-            // Apply search filter
             if (!string.IsNullOrWhiteSpace(searchTerm))
             {
                 query = query.Where(q => q.Content.Contains(searchTerm));
             }
 
-            // Apply tag filter
             if (tagIds != null && tagIds.Any())
             {
                 query = query.Where(q => q.QuestionTags.Any(qt => tagIds.Contains(qt.TagId)));
             }
+            
+            if (from.HasValue)
+            {
+                query = query.Where(q => q.CreatedAt >= from.Value);
+            }
+            
+            if (to.HasValue)
+            {
+                query = query.Where(q => q.CreatedAt <= to.Value);
+            }
 
-            // Apply sorting
             query = sortByDateDescending
                 ? query.OrderByDescending(q => q.CreatedAt)
                 : query.OrderBy(q => q.CreatedAt);
 
-            // Get total count
             var totalCount = await query.CountAsync();
 
-            // Apply pagination
             var items = await query
                 .Skip(skip)
                 .Take(take)

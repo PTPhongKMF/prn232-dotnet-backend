@@ -16,6 +16,8 @@ namespace MathslideLearning.Data.Interfaces
             IEnumerable<int>? tagIds,
             bool sortByDateDescending,
             int skip,
-            int take);
+            int take,
+            DateTime? from = null,
+            DateTime? to = null);
     }
 }
