@@ -12,5 +12,9 @@ namespace MathslideLearning.Data.Interfaces
         Task<Tag> UpdateAsync(Tag tag);
         Task<bool> DeleteAsync(int id);
         Task<Tag> GetByNameAsync(string name);
+        Task<(IEnumerable<Tag> items, int totalCount)> GetFilteredTagsAsync(
+            string? searchTerm,
+            int skip,
+            int take);
     }
 }

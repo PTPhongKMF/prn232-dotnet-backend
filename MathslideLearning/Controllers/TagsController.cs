@@ -27,6 +27,21 @@ namespace MathslideLearning.Controllers
             var tags = await _tagService.GetAllTagsAsync();
             return Api200(tags);
         }
+        
+        [HttpGet("filtered")]
+        [AllowAnonymous]
+        public async Task<IActionResult> GetFilteredPaged([FromQuery] FilteredPagedTagRequestDto request)
+        {
+            try
+            {
+                var tags = await _tagService.GetFilteredPagedTagsAsync(request);
+                return Api200(tags);
+            }
+            catch (Exception ex)
+            {
+                return Api400<object>(ex.Message, new { message = ex.Message });
+            }
+        }
 
         [HttpPost]
         [Authorize(Roles = "Admin,Teacher")]

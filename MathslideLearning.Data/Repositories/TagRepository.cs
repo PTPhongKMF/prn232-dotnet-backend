@@ -2,7 +2,9 @@
 using MathslideLearning.Data.Entities;
 using MathslideLearning.Data.Interfaces;
 using Microsoft.EntityFrameworkCore;
+using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace MathslideLearning.Data.Repositories
@@ -56,6 +58,29 @@ namespace MathslideLearning.Data.Repositories
             _context.Tags.Remove(tag);
             await _context.SaveChangesAsync();
             return true;
+        }
+
+        public async Task<(IEnumerable<Tag> items, int totalCount)> GetFilteredTagsAsync(
+            string? searchTerm, 
+            int skip, 
+            int take)
+        {
+            var query = _context.Tags.AsQueryable();
+
+            if (!string.IsNullOrWhiteSpace(searchTerm))
+            {
+                query = query.Where(t => t.Name.Contains(searchTerm));
+            }
+
+            var totalCount = await query.CountAsync();
+
+            var items = await query
+                .OrderBy(t => t.Name)
+                .Skip(skip)
+                .Take(take)
+                .ToListAsync();
+
+            return (items, totalCount);
         }
     }
 }

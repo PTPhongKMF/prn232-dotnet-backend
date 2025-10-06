@@ -2,6 +2,7 @@
 using MathslideLearning.Models.TagDtos;
 using MathslideLearning.Data.Entities;
 using MathslideLearning.Data.Interfaces;
+using MathslideLearning.Models.PagnitionDtos;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -77,6 +78,28 @@ namespace MathslideLearning.Business.Services
             }
 
             return await _tagRepository.DeleteAsync(id);
+        }
+
+        public async Task<PagedResult<TagDto>> GetFilteredPagedTagsAsync(FilteredPagedTagRequestDto request)
+        {
+            var skip = (request.PageNumber - 1) * request.PageSize;
+            var (items, totalCount) = await _tagRepository.GetFilteredTagsAsync(
+                request.SearchTerm,
+                skip,
+                request.PageSize);
+            
+            var totalPages = (int)Math.Ceiling(totalCount / (double)request.PageSize);
+            
+            return new PagedResult<TagDto>
+            {
+                Results = items.Select(t => new TagDto { Id = t.Id, Name = t.Name }),
+                Pagnition = new PaginationDto
+                {
+                    PageNumber = request.PageNumber,
+                    PageSize = request.PageSize,
+                    TotalPages = totalPages
+                }
+            };
         }
     }
 }
