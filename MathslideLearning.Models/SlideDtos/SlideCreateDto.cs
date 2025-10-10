@@ -20,9 +20,8 @@ namespace MathslideLearning.Models.SlideDtos
         [Range(1, 12, ErrorMessage = "Grade must be between 1 and 12.")]
         public int? Grade { get; set; }
 
-        public bool IsPublished { get; set; } = false; 
+        public bool IsPublished { get; set; } = false;
 
-        [Required]
         public List<SlidePageCreateDto> SlidePages { get; set; }
     }
 }
