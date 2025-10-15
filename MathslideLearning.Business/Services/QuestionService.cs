@@ -22,7 +22,7 @@ namespace MathslideLearning.Business.Services
             _mapper = mapper;
         }
 
-        public async Task<QuestionResponseDto> CreateQuestionAsync(QuestionRequestDto request)
+        public async Task<QuestionResponseDto> CreateQuestionAsync(QuestionRequestDto request, int teacherId)
         {
             if (!request.Answers.Any(a => a.IsCorrect))
             {
@@ -33,6 +33,7 @@ namespace MathslideLearning.Business.Services
             {
                 Content = request.Content,
                 Type = request.Type,
+                TeacherId = teacherId,
                 Answers = request.Answers.Select(a => new Answer { Content = a.Content, IsCorrect = a.IsCorrect }).ToList(),
                 QuestionTags = request.TagIds.Select(tagId => new QuestionTag { TagId = tagId }).ToList()
             };

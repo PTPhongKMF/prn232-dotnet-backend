@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using System;
+using System.Security.Claims;
 using System.Threading.Tasks;
 
 namespace MathslideLearning.Controllers
@@ -69,7 +70,8 @@ namespace MathslideLearning.Controllers
 
             try
             {
-                var newQuestion = await _questionService.CreateQuestionAsync(request);
+                var teacherId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
+                var newQuestion = await _questionService.CreateQuestionAsync(request, teacherId);
                 return Api201(newQuestion);
             }
             catch (Exception ex)
