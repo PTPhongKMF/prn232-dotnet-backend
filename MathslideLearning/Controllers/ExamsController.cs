@@ -8,6 +8,8 @@ using Microsoft.AspNetCore.Mvc.ModelBinding;
 using System;
 using System.Security.Claims;
 using System.Threading.Tasks;
+using MathslideLearning.Models.ExamDtos;
+
 
 namespace MathslideLearning.Controllers
 {
@@ -137,5 +139,46 @@ namespace MathslideLearning.Controllers
             var history = await _examService.GetExamHistoryForStudentAsync(studentId);
             return Api200(history);
         }
+
+
+        [HttpPost("{examId}/questions/add-existing")]
+        [Authorize(Roles = "Admin,Teacher")]
+        public async Task<IActionResult> AddExistingQuestionsToExam(int examId, [FromBody] AddExistingQuestionsRequestDto request)
+        {
+            if (request.QuestionIds == null || !request.QuestionIds.Any())
+                return Api400<object>("QuestionIds cannot be empty");
+
+            try
+            {
+                var result = await _examService.AddExistingQuestionsToExamAsync(examId, request.QuestionIds);
+                if (!result)
+                    return Api404<object>("Exam or questions not found");
+                return Api200<object>("Questions added successfully", null);
+            }
+            catch (Exception ex)
+            {
+                return Api400<object>(ex.Message, new { message = ex.Message });
+            }
+        }
+
+        [HttpDelete("{examId}/questions/{questionId}")]
+        [Authorize(Roles = "Admin,Teacher")]
+        public async Task<IActionResult> RemoveQuestionFromExam(int examId, int questionId)
+        {
+            try
+            {
+                var result = await _examService.RemoveQuestionFromExamAsync(examId, questionId);
+                if (!result)
+                    return Api404<object>("Exam or question not found");
+                return Api200<object>("Question removed successfully", null);
+            }
+            catch (Exception ex)
+            {
+                return Api400<object>(ex.Message, new { message = ex.Message });
+            }
+        }
+
+
+
     }
 }

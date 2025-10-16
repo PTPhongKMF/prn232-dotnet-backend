@@ -62,5 +62,45 @@ namespace MathslideLearning.Data.Repositories
             await _context.SaveChangesAsync();
             return true;
         }
+        public async Task<IEnumerable<Exam>> GetAllAsync()
+        {
+            return await _context.Exams
+                .Include(e => e.Teacher)
+                .Include(e => e.ExamQuestions)
+                    .ThenInclude(eq => eq.Question)
+                .ToListAsync();
+        }
+
+        public async Task<bool> AddQuestionsToExamAsync(int examId, List<int> questionIds)
+        {
+            var exam = await _context.Exams
+       .Include(e => e.ExamQuestions)
+       .FirstOrDefaultAsync(e => e.Id == examId);
+
+            if (exam == null) return false;
+
+            foreach (var qId in questionIds)
+            {
+                if (!exam.ExamQuestions.Any(eq => eq.QuestionId == qId))
+                {
+                    exam.ExamQuestions.Add(new ExamQuestion { ExamId = examId, QuestionId = qId });
+                }
+            }
+
+            await _context.SaveChangesAsync();
+            return true;
+        }
+
+        public async Task<bool> RemoveQuestionFromExamAsync(int examId, int questionId)
+        {
+            var examQuestion = await _context.Set<ExamQuestion>()
+        .FirstOrDefaultAsync(eq => eq.ExamId == examId && eq.QuestionId == questionId);
+
+            if (examQuestion == null) return false;
+
+            _context.Set<ExamQuestion>().Remove(examQuestion);
+            await _context.SaveChangesAsync();
+            return true;
+        }
     }
 }

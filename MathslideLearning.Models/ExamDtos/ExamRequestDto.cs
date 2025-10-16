@@ -13,6 +13,6 @@ namespace MathslideLearning.Models.ExamDtos
 
         [Required]
         [MinLength(1, ErrorMessage = "An exam must have at least one question.")]
-        public required List<int> QuestionIds { get; set; }
+        public required List<int>? QuestionIds { get; set; }
     }
 }

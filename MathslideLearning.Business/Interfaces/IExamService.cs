@@ -15,5 +15,8 @@ namespace MathslideLearning.Business.Interfaces
 
         Task<ExamResultDto> SubmitExamAsync(int studentId, int examId, ExamSubmissionDto submission);
         Task<IEnumerable<UserExamHistoryDto>> GetExamHistoryForStudentAsync(int studentId);
+        Task<bool> AddExistingQuestionsToExamAsync(int examId, List<int> questionIds);
+        Task<bool> RemoveQuestionFromExamAsync(int examId, int questionId);
+
     }
 }
