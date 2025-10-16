@@ -59,14 +59,17 @@ builder.Services.AddScoped<IUserExamHistoryRepository, UserExamHistoryRepository
 
 builder.Services.AddAutoMapper(cfg => cfg.AddMaps(typeof(ModelAutoMapper).Assembly));
 
-builder.Services.AddCors(options => {
+builder.Services.AddCors(options =>
+{
     options.AddPolicy("AllowedOrigins",
-        policy => {
+        policy =>
+        {
             policy.WithOrigins("http://localhost:5173", "https://mathslidelearning.pages.dev")
                   .AllowAnyHeader()
                   .AllowAnyMethod();
         });
 });
+builder.Services.AddHttpClient();
 
 builder.Services.AddControllers().AddJsonOptions(options =>
 {
