@@ -131,7 +131,8 @@ namespace MathslideLearning.Business.Services
                 Name = user.Name,
                 Email = user.Email,
                 Role = user.Role,
-                Grade = user.Grade
+                Grade = user.Grade,
+                IsDeleted = user.IsDeleted
             });
         }
         private string GenerateJwtToken(User user)
