@@ -102,5 +102,19 @@ namespace MathslideLearning.Data.Repositories
             await _context.SaveChangesAsync();
             return true;
         }
+
+        public async Task<Exam> GetExamDetailByIdAsync(int examId)
+        {
+            return await _context.Exams
+        .Include(e => e.ExamQuestions)
+            .ThenInclude(eq => eq.Question)
+                .ThenInclude(q => q.Answers)
+        .Include(e => e.ExamQuestions)
+            .ThenInclude(eq => eq.Question)
+                .ThenInclude(q => q.QuestionTags)
+                    .ThenInclude(qt => qt.Tag)
+        .Include(e => e.Teacher)
+        .FirstOrDefaultAsync(e => e.Id == examId);
+        }
     }
 }

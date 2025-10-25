@@ -178,7 +178,23 @@ namespace MathslideLearning.Controllers
             }
         }
 
+        [HttpGet("{examId}/questions")]
+        [Authorize(Roles = "Admin,Teacher,Student")]
+        public async Task<IActionResult> GetExamQuestions(int examId)
+        {
+            try
+            {
+                var exam = await _examService.GetExamByIdAsync(examId);
+                if (exam == null)
+                    return Api404<object>("Exam not found");
 
+                return Api200(exam.Questions ?? new List<QuestionResponseDto>());
+            }
+            catch (Exception ex)
+            {
+                return Api400<object>(ex.Message, new { message = ex.Message });
+            }
+        }
 
     }
 }
