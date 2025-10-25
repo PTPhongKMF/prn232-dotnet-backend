@@ -10,6 +10,7 @@ namespace MathslideLearning.Models.ExamDtos
         public string Content { get; set; }
         public int TeacherId { get; set; }
         public string TeacherName { get; set; }
+        public int QuestionsCount { get; set; }
         public List<QuestionResponseDto> Questions { get; set; }
     }
 }
